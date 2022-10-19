@@ -2,10 +2,12 @@ from ray import workflow
 import time
  
 # Create an event which finishes after 60 seconds.
-event1_step = workflow.wait_for_event(workflow.event_listener.TimerListener, time.time() + 60)
+event1_step = workflow.wait_for_event(
+    workflow.event_listener.TimerListener, time.time() + 60)
  
 # Create another event which finishes after 30 seconds.
-event2_step = workflow.wait_for_event(workflow.event_listener.TimerListener, time.time() + 30)
+event2_step = workflow.wait_for_event(
+    workflow.event_listener.TimerListener, time.time() + 30)
  
 @workflow.step
 def gather(*args):
