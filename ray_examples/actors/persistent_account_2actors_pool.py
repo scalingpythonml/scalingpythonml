@@ -36,11 +36,13 @@ class FilePersistence(BasePersitence):
             return None
 
 #tag::persist_pool[]
-pool = ActorPool([FilePersistence.remote(), FilePersistence.remote(), FilePersistence.remote()])
+pool = ActorPool([
+    FilePersistence.remote(), FilePersistence.remote(), FilePersistence.remote()])
 
 @ray.remote
 class Account:
-    def __init__(self, balance: float, minimal_balance: float, account_key: str, persistence: ActorPool):
+    def __init__(self, balance: float, minimal_balance: float,
+                 account_key: str, persistence: ActorPool):
         self.persistence = persistence
         self.key = account_key
         if not self.restorestate():
@@ -84,12 +86,15 @@ class Account:
             return False
 
     def storestate(self):
-        self.persistence.submit(lambda a, v: a.save.remote(v), (self.key,
-                                    {'balance' : self.balance, 'minimal' : self.minimal}))
+        self.persistence.submit(
+            lambda a, v: a.save.remote(v),
+            (self.key,
+             {'balance' : self.balance, 'minimal' : self.minimal}))
 
 
-account_actor = Account.options(name='Account').remote(balance=100.,minimal_balance=20.,
-                                    account_key='1234567', persistence=pool)
+account_actor = Account.options(name='Account').remote(
+    balance=100.,minimal_balance=20.,
+    account_key='1234567', persistence=pool)
 #end::persist_pool[]
 
 print(f"Current balance {ray.get(account_actor.balance.remote())}")
