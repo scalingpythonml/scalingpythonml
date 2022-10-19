@@ -210,7 +210,8 @@ df_diff_with_emp_size.head(1)
 
 
 #tag::custom_agg[]
-# Write a custom weighted mean, we get either a DataFrameGroupBy with multiple columns or SeriesGroupBy for each chunk
+# Write a custom weighted mean, we get either a DataFrameGroupBy 
+# with multiple columns or SeriesGroupBy for each chunk
 def process_chunk(chunk):
     def weighted_func(df):
         return (df["EmployerSize"] * df["DiffMeanHourlyPercent"]).sum()
@@ -228,7 +229,8 @@ weighted_mean = dd.Aggregation(
     agg=agg,
     finalize=finalize)
 
-aggregated = df_diff_with_emp_size.groupby("PostCode")["EmployerSize", "DiffMeanHourlyPercent"].agg(weighted_mean)
+aggregated = (df_diff_with_emp_size.groupby("PostCode")
+              ["EmployerSize", "DiffMeanHourlyPercent"].agg(weighted_mean))
 #end::custom_agg[]
 j = aggregated.head(4)
 j
@@ -248,7 +250,8 @@ approx_unique = dd.Aggregation(
     agg=hyperloglog.reduce_state,
     finalize=hyperloglog.estimate_count)
 
-aggregated = df_diff_with_emp_size.groupby("PostCode")["EmployerSize", "DiffMeanHourlyPercent"].agg(weighted_mean)
+aggregated = (df_diff_with_emp_size.groupby("PostCode")
+              ["EmployerSize", "DiffMeanHourlyPercent"].agg(weighted_mean))
 #end::custom_agg_hyperloglog[]
 j = aggregated.head(4)
 j
@@ -317,7 +320,9 @@ dask.compute(
 
 # Drop columns & rows we don't care about before repartitioning
 #tag::index_covid_data[]
-mini_sf_covid_df = sf_covid_df[sf_covid_df['vaccination_status'] == 'All'][['specimen_collection_date', 'new_cases']]
+mini_sf_covid_df = (sf_covid_df
+                    [sf_covid_df['vaccination_status'] == 'All']
+                    [['specimen_collection_date', 'new_cases']])
 #end::index_covid_data[]
 
 
@@ -340,7 +345,10 @@ indexed_df.head(1)
 from datetime import datetime
 
 #tag::set_index_with_rolling_window[]
-divisions = pd.date_range(start="2021-01-01", end=datetime.today(), freq='7D').tolist()
+divisions = pd.date_range(
+    start="2021-01-01",
+    end=datetime.today(),
+    freq='7D').tolist()
 partitioned_df_as_part_of_set_index = mini_sf_covid_df.set_index(
     'specimen_collection_date', divisions=divisions)
 #end::set_index_with_rolling_window[]
@@ -382,7 +390,13 @@ partitioned_df.divisions
 
 # Rolling average with time delta
 #tag::rolling_date_ex[]
-rolling_avg = partitioned_df.map_overlap(lambda df: df.rolling('5D').mean(), pd.Timedelta('5D'), 0)
+def process_overlap_window(df):
+    return df.rolling('5D').mean()
+
+rolling_avg = partitioned_df.map_overlap(
+    process_overlap_window,
+    pd.Timedelta('5D'),
+    0)
 #end::rolling_date_ex[]
 
 

@@ -1,21 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
-import dask
-from dask_kubernetes import KubeCluster
-import numpy as np
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
+# In[1]:
 
 
 import dask
@@ -34,25 +20,25 @@ from dask.distributed import Client
 client = Client(cluster)
 
 
-# In[ ]:
+# In[2]:
 
 
 cluster.adapt(minimum=1, maximum=10)
 
 
-# In[ ]:
+# In[3]:
 
 
 client.scheduler_comm.comm.handshake_info()
 
 
-# In[ ]:
+# In[4]:
 
 
 import dask.array as da
 
 
-# In[ ]:
+# In[5]:
 
 
 # Create a large array and calculate the mean
@@ -62,7 +48,7 @@ print(array.mean().compute())  # Should print 1.0|
 
 # So now we know the cluster is doing ok :)
 
-# In[ ]:
+# In[6]:
 
 
 class Counter:
@@ -88,32 +74,32 @@ future = client.submit(Counter, actor=True)  # Create a Counter on a worker
 counter = future.result()     
 
 
-# In[ ]:
+# In[7]:
 
 
 counter
 
 
-# In[ ]:
+# In[8]:
 
 
 counter.increment()
 
 
-# In[ ]:
+# In[9]:
 
 
 counter.value().result()
 
 
-# In[ ]:
+# In[10]:
 
 
 import dask.bag as db
 b = db.from_sequence(range(0, 10))
 
 
-# In[ ]:
+# In[11]:
 
 
 #tag::result_future_not_ser[]
@@ -128,38 +114,38 @@ def inc(x):
 #end::result_future_not_ser[]
 
 
-# In[ ]:
+# In[12]:
 
 
 c = client
 futures = list(map(lambda x: c.submit(inc, x), range(10)))
 
 
-# In[ ]:
+# In[13]:
 
 
 futures
 
 
-# In[ ]:
+# In[14]:
 
 
 counter.value().result()
 
 
-# In[ ]:
+# In[15]:
 
 
 futures[5].result()
 
 
-# In[ ]:
+# In[16]:
 
 
 counter.value().result()
 
 
-# In[ ]:
+# In[17]:
 
 
 #tag::make_account[]
@@ -191,7 +177,7 @@ account = account_future.result()
 #end::make_account[]
 
 
-# In[ ]:
+# In[18]:
 
 
 #tag::use_account[]
@@ -207,13 +193,13 @@ except Exception as e:
 #end::use_account[]
 
 
-# In[ ]:
+# In[19]:
 
 
 f = account.withdrawl(1)
 
 
-# In[ ]:
+# In[20]:
 
 
 f.result()
