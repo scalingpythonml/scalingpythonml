@@ -193,7 +193,7 @@ print(ray.get(sum_values.remote([generate_number.remote(1, 10, .1),
 def generate_number(s: int, limit: int) -> int :
    random.seed(s)
    time.sleep(.1)
-   return randint(0, limit)
+   return random.randint(0, limit)
 
 @ray.remote
 def remote_objrefs():
@@ -238,7 +238,9 @@ def fetch(url: str) -> Tuple[str, str]:
 @ray.remote
 def has_spam(site_text: Tuple[str, str]) -> bool:
     # Open the list of spammers or download it
-    spammers_url = "https://raw.githubusercontent.com/matomo-org/referrer-spam-list/master/spammers.txt"
+    spammers_url = (
+        "https://raw.githubusercontent.com/matomo-org/referrer-spam-list/master/spammers.txt"
+    )
     import urllib.request
     with urllib.request.urlopen(spammers_url) as response:
             spammers = response.readlines()
@@ -293,4 +295,10 @@ while len(not_ready) > 0:
     if len(ready) < 1:
         raise Exception("Error fetching futures")
     print(ray.get(ready))
+
+
+# In[ ]:
+
+
+
 

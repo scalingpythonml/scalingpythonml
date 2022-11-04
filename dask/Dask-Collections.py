@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from typing import List
@@ -12,27 +12,33 @@ import dask.bag as bag
 from dask.distributed import Client
 
 
-# In[ ]:
+# In[2]:
 
 
 # Note: if we were on a cluster we'd have to do more magic to install it on all the nodes in the cluster.
 get_ipython().system('pip install PyPDF2')
 
 
-# In[ ]:
+# In[3]:
 
 
 import fsspec
 
 
-# In[ ]:
+# In[8]:
+
+
+
+
+
+# In[4]:
 
 
 client = Client()
 client
 
 
-# In[ ]:
+# In[9]:
 
 
 #tag::custom_load[]
@@ -56,7 +62,7 @@ def load_data(path: str):
 #end::custom_load[]
 
 
-# In[ ]:
+# In[12]:
 
 
 #tag::preprocess_json[]
@@ -77,7 +83,7 @@ df = bag.Bag.to_dataframe(cleaned_records)
 #end::preprocess_json[]
 
 
-# In[ ]:
+# In[13]:
 
 
 df.head()

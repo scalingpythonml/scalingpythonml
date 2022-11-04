@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[2]:
 
 
 #tag::get_started_streamz[]
@@ -14,7 +14,7 @@ client = Client()
 #end::get_started_streamz[]
 
 
-# In[ ]:
+# In[3]:
 
 
 #tag::make_local_stream[]
@@ -27,25 +27,25 @@ dask_stream = local_stream.scatter()
 #end::make_local_stream[]
 
 
-# In[ ]:
+# In[5]:
 
 
 #tag::define_sink[]
 dask_stream.gather().sink(print)
 #end::define_sink[]
-tag::run[]
+#tag::run[]
 dask_stream.start()
 #end::run[]
 
 
-# In[ ]:
+# In[6]:
 
 
 import time
 #time.sleep(5)
 
 
-# In[ ]:
+# In[7]:
 
 
 #tag::make_kafka_stream[]

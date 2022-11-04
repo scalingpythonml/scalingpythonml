@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import dask
 from dask.distributed import Client
 from dask_kubernetes import KubeCluster, make_pod_spec
+
+
+# In[ ]:
+
+
 dask.config.set({"kubernetes.scheduler-service-type": "LoadBalancer"})
 worker_template = make_pod_spec(image='holdenk/dask:latest',
                          memory_limit='8G', memory_request='8G',
@@ -14,31 +19,32 @@ worker_template = make_pod_spec(image='holdenk/dask:latest',
 scheduler_template = make_pod_spec(image='holdenk/dask:latest',
                          memory_limit='4G', memory_request='4G',
                          cpu_limit=1, cpu_request=1)
-cluster = KubeCluster(pod_template = worker_template, scheduler_pod_template = scheduler_template)
-cluster.adapt()    # or create and destroy workers dynamically based on workload
+cluster = None
+distributed = False
+if distributed:
+    cluster = KubeCluster(pod_template = worker_template, scheduler_pod_template = scheduler_template)
+    cluster.adapt()    # or create and destroy workers dynamically based on workload
+else:
+    from dask.distributed import LocalCluster
+    cluster = LocalCluster()
 from dask.distributed import Client
 client = Client(cluster)
-
-
-# In[2]:
-
-
 cluster.adapt(minimum=1, maximum=10)
 
 
-# In[3]:
+# In[ ]:
 
 
 client.scheduler_comm.comm.handshake_info()
 
 
-# In[4]:
+# In[ ]:
 
 
 import dask.array as da
 
 
-# In[5]:
+# In[ ]:
 
 
 # Create a large array and calculate the mean
@@ -48,7 +54,7 @@ print(array.mean().compute())  # Should print 1.0|
 
 # So now we know the cluster is doing ok :)
 
-# In[6]:
+# In[ ]:
 
 
 class Counter:
@@ -74,32 +80,32 @@ future = client.submit(Counter, actor=True)  # Create a Counter on a worker
 counter = future.result()     
 
 
-# In[7]:
+# In[ ]:
 
 
 counter
 
 
-# In[8]:
+# In[ ]:
 
 
 counter.increment()
 
 
-# In[9]:
+# In[ ]:
 
 
 counter.value().result()
 
 
-# In[10]:
+# In[ ]:
 
 
 import dask.bag as db
 b = db.from_sequence(range(0, 10))
 
 
-# In[11]:
+# In[ ]:
 
 
 #tag::result_future_not_ser[]
@@ -114,38 +120,38 @@ def inc(x):
 #end::result_future_not_ser[]
 
 
-# In[12]:
+# In[ ]:
 
 
 c = client
 futures = list(map(lambda x: c.submit(inc, x), range(10)))
 
 
-# In[13]:
+# In[ ]:
 
 
 futures
 
 
-# In[14]:
+# In[ ]:
 
 
 counter.value().result()
 
 
-# In[15]:
+# In[ ]:
 
 
 futures[5].result()
 
 
-# In[16]:
+# In[ ]:
 
 
 counter.value().result()
 
 
-# In[17]:
+# In[ ]:
 
 
 #tag::make_account[]
@@ -177,7 +183,7 @@ account = account_future.result()
 #end::make_account[]
 
 
-# In[18]:
+# In[ ]:
 
 
 #tag::use_account[]
@@ -193,16 +199,80 @@ except Exception as e:
 #end::use_account[]
 
 
-# In[19]:
+# In[ ]:
 
 
 f = account.withdrawl(1)
 
 
-# In[20]:
+# In[ ]:
 
 
 f.result()
+
+
+# In[ ]:
+
+
+#tag::make_sketchy_bank[]
+class SketchyBank:
+    """ A sketchy bank (handles mutliple accounts in one actor)."""
+
+    # 42 is a good start
+    def __init__(self, accounts = {} ):
+        self._accounts = accounts
+        
+    def create_account(self, key):
+        if key in self._accounts:
+            raise Exception(f"{key} is already an account.")
+        self._accounts[key] = 0.0
+
+    def deposit(self, key, amount):
+        if amount < 0:
+            raise Exception("Can not deposit negative amount")
+        if key not in self._accounts:
+            raise Exception(f"Could not find account {key}")
+        self._accounts[key] += amount
+        return self._accounts[key]
+
+    def withdrawl(self, key, amount):
+        if key not in self._accounts:
+            raise Exception(f"Could not find account {key}")
+        if amount > self._accounts[key]:
+            raise Exception("Please deposit more money first.")
+        self._accounts[key] -= amount
+        return self._accounts[key]
+
+    def balance(self, key):
+        if key not in self._accounts:
+            raise Exception(f"Could not find account {key}")
+        return self._accounts[key]
+
+
+class HashActorPool:
+    """A basic determinstic actor pool."""
+    
+    def __init__(self, actorClass, num):
+        self._num = num
+        # Make the request number of actors
+        self._actors = list(
+            map(lambda x: client.submit(SketchyBank, actor=True).result(),
+                range(0, num)))
+        
+    def actor_for_key(self, key):
+        return self._actors[ hash(key) % self._num ]
+
+
+holdens_questionable_bank = HashActorPool(SketchyBank, 10)
+holdens_questionable_bank.actor_for_key("timbit").create_account("timbit")
+holdens_questionable_bank.actor_for_key("timbit").deposit("timbit", 42.0).result()
+#end::make_sketchy_bank[]
+
+
+# In[ ]:
+
+
+holdens_questionable_bank.actor_for_key("timbit").deposit("timbit", 42.0).result()
 
 
 # In[ ]:
