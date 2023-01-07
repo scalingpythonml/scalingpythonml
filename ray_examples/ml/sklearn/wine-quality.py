@@ -24,7 +24,8 @@ print(df['goodquality'].value_counts())
 X_features = X
 X = StandardScaler().fit_transform(X)
 # Splitting the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25, random_state=0)
+X_train, X_test, y_train, y_test = \
+    train_test_split(X, y, test_size=.25, random_state=0)
 
 param_model = {'max_depth':range(10, 20),
                 'max_features': range(3,11)}
@@ -36,7 +37,8 @@ model = GridSearchCV(DecisionTreeClassifier(random_state=1),
                      n_jobs=-1)
 
 model = model.fit(X_train, y_train)
-print(f"executed in {time.time() - start}, nodes {model.best_estimator_.tree_.node_count}, "
+print(f"executed in {time.time() - start}, "
+      f"nodes {model.best_estimator_.tree_.node_count}, "
       f"max_depth {model.best_estimator_.tree_.max_depth}")
 
 y_pred = model.predict(X_test)

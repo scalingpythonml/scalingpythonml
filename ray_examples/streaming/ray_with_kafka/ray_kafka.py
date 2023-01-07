@@ -77,8 +77,9 @@ class KafkaConsumer:
 
 # Simple callback function to print topics
 def print_message(consumer_id: str, msg):
-    print(f"Consumer {consumer_id} new message: topic={msg.topic()}  partition= {msg.partition()}  "
-          f"offset={msg.offset()} key={msg.key().decode('UTF8')}")
+    print(f"Consumer {consumer_id} new message: topic={msg.topic()}  "
+          f"partition= {msg.partition()}  offset={msg.offset()} "
+          f"key={msg.key().decode('UTF8')}")
     print(json.loads(msg.value().decode('UTF8')))
 
 # Setup topics

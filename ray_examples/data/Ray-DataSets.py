@@ -162,7 +162,9 @@ def init_func(key):
 
 def accumulate_func(accumulated, row):
     return [
-        accumulated[0] + (float(row["EmployerSize"]) * float(row["DiffMeanHourlyPercent"])),
+        (accumulated[0] + 
+         (float(row["EmployerSize"]) *
+          float(row["DiffMeanHourlyPercent"]))),
         accumulated[1] + row["DiffMeanHourlyPercent"]]
         
 def combine_aggs(agg1, agg2):

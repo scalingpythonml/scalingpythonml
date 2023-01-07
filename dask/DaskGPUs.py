@@ -5,66 +5,57 @@
 
 
 # Dask local GPU
-
-
-# In[ ]:
-
-
-get_ipython().system('pip freeze')
-
-
-# In[ ]:
-
-
-# Dask Kube GPU
 import dask
+
+
+# In[ ]:
+
+
+#tag::dask_local_gpu[]
+from dask_cuda import LocalCUDACluster
 from dask.distributed import Client
-from dask_kubernetes import KubeCluster, make_pod_spec
-#tag::worker_template_with_gpu[]
-worker_template = make_pod_spec(image='holdenk/dask:latest',
-                         memory_limit='8G', memory_request='8G',
-                         cpu_limit=1, cpu_request=1)
-worker_template.spec.containers[0].resources.limits["gpu"] = 1
-worker_template.spec.containers[0].resources.requests["gpu"] = 1
-worker_template.spec.containers[0].args[0] = "dask-cuda-worker"
-worker_template.spec.containers[0].env.append("NVIDIA_VISIBLE_DEVICES=ALL")
-# Or append --resources "GPU=2"
-#end::worker_template_with_gpu[]
-#tag::worker_template_with_label[]
-worker_template = make_pod_spec(image='holdenk/dask:latest',
-                         memory_limit='8G', memory_request='8G',
-                         cpu_limit=1, cpu_request=1)
-worker_template.spec.node_selector = "node.kubernetes.io/gpu=gpu"
-worker_template.spec.containers[0].args[0] = "dask-cuda-worker"
-worker_template.spec.containers[0].env.append("NVIDIA_VISIBLE_DEVICES=ALL")
-worker_template.spec.
-# Or append --resources "GPU=2"
-#end::worker_template_with_label[]
-scheduler_template = make_pod_spec(image='holdenk/dask:latest',
-                         memory_limit='4G', memory_request='4G',
-                         cpu_limit=1, cpu_request=1)
-cluster = KubeCluster(pod_template = worker_template, scheduler_pod_template = scheduler_template, namespace="dask")
-cluster.adapt()    # or create and destroy workers dynamically based on workload
-from dask.distributed import Client
+#NOTE: The resources= flag is important, by default the LocalCUDACluster *does not* label any resources which can make
+# porting your code to a cluster where some workers have GPUs and some not painful.
+cluster = LocalCUDACluster(resources={"GPU": 1})
 client = Client(cluster)
+#end::dask_local_gpu[]
 
 
 # In[ ]:
 
 
-#!pip install --user git+https://github.com/dask/dask-kubernetes.git
+cluster
 
 
 # In[ ]:
 
 
-import dask_cudf
+def how_many_gpus(x):
+    import torch
+    return torch.cuda.device_count(); 
 
 
 # In[ ]:
 
 
-worker_template.spec.containers[0].env.append("NVIDIA_VISIBLE_DEVICES=ALL")
+#tag::ex_submit_gpu[]
+future = client.submit(how_many_gpus, 1, resources={'GPU': 1})
+#end::ex_submit_gpu[]
+
+
+# In[ ]:
+
+
+client.gather(future)
+
+
+# In[ ]:
+
+
+#tag::ex_annotate_gpu[]
+with dask.annotate(resources={'GPU': 1}):
+    future = client.submit(how_many_gpus, 1)
+#end::ex_annotate_gpu[]
 
 
 # In[ ]:

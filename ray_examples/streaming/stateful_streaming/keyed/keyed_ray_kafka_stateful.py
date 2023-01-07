@@ -29,8 +29,9 @@ class TemperatureControllerManager:
 
 @ray.remote
 class KafkaConsumer(BaseKafkaConsumer):
-    def __init__(self, producer: KafkaProducer, group: str = 'ray', server: str = 'localhost:9092',
-                 topic: str = 'sensor', restart: str = 'earliest'):
+    def __init__(self, producer: KafkaProducer, group: str = 'ray',
+                 server: str = 'localhost:9092', topic: str = 'sensor',
+                 restart: str = 'earliest'):
         super().__init__(group=group, server = server, topic = topic, restart = restart)
         self.callback = TemperatureControllerManager(producer).process_controller_message
 
