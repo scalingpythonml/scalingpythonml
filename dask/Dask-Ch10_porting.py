@@ -34,7 +34,7 @@ cluster.scale(num_workers)
 
 # Connect to the cluster
 client = Client(cluster)
-#end::ex_yarn_deployment
+#end::ex_yarn_deployment[]
 
 
 # In[ ]:
@@ -62,7 +62,7 @@ client = Client(cluster)
 
 cluster.adapt(minimum_jobs=10, maximum_jobs=100)  # auto-scale between 10 and 100 jobs
 cluster.adapt(maximum_memory="10 TB")  # or use core/memory limits
-#end::ex_slurm_deployment
+#end::ex_slurm_deployment[]
 
 
 # In[ ]:
@@ -100,7 +100,7 @@ df = dd.read_parquet(
     storage_options=minio_storage_options, 
     engine="pyarrow"
 )
-#end::ex_s3_minio_rw
+#end::ex_s3_minio_rw[]
 
 
 # In[ ]:
@@ -201,7 +201,7 @@ FROM tempdf
 ORDER BY average_fare DESC
 LIMIT 5
 PRINT
-#end::ex_fugue_SQL
+#end::ex_fugue_SQL[]
 
 
 # In[ ]:
