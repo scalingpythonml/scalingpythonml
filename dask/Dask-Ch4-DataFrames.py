@@ -70,8 +70,10 @@ df = dd.read_csv(
 # In[ ]:
 
 
+#tag::fsspec[]
 from fsspec.registry import known_implementations
 known_implementations
+#end::fsspec[]
 
 
 # In[ ]:
