@@ -1,3 +1,5 @@
+jupyter
+dask
 pyarrow
 pyspark
 dask-kubernetes

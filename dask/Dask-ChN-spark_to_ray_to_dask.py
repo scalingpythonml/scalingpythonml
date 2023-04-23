@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[ ]:
 
 
 import os
@@ -11,7 +11,7 @@ os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 
-# In[4]:
+# In[ ]:
 
 
 from pyspark.sql.session import SparkSession
@@ -19,13 +19,13 @@ from pyspark.sql import SQLContext
 
 
 
-# In[5]:
+# In[ ]:
 
 
 get_ipython().system('java -version')
 
 
-# In[6]:
+# In[ ]:
 
 
 import pyspark
@@ -50,7 +50,7 @@ import pyspark
 
 
 
-# In[7]:
+# In[ ]:
 
 
 import raydp
@@ -65,7 +65,7 @@ spark = raydp.init_spark(
 )
 
 
-# In[86]:
+# In[ ]:
 
 
 from ray.util.dask import ray_dask_get, enable_dask_on_ray, disable_dask_on_ray
@@ -85,13 +85,13 @@ enable_dask_on_ray()
 df = spark.createDataFrame(["Anna","Bob","Sue"], "string").toDF("firstname")
 
 
-# In[9]:
+# In[ ]:
 
 
 df.show()
 
 
-# In[10]:
+# In[ ]:
 
 
 names = ["Anna", "Bob", "Liam", "Olivia", "Noah", "Emma", "Oliver", "Ava", "Elijah", "Charlotte"]
@@ -106,19 +106,19 @@ num_records = len(names)
 student_records = [StudentRecord(i, f'{names[i]}') for i in range(num_records)] 
 
 
-# In[11]:
+# In[ ]:
 
 
 student_records
 
 
-# In[12]:
+# In[ ]:
 
 
 df = spark.createDataFrame(student_records, ['name', 'id'])
 
 
-# In[13]:
+# In[ ]:
 
 
 df.show()
@@ -136,19 +136,19 @@ df.show()
 
 
 
-# In[14]:
+# In[ ]:
 
 
 ray_dataset = ray.data.from_spark(df)
 
 
-# In[15]:
+# In[ ]:
 
 
 ray_dataset.show()
 
 
-# In[16]:
+# In[ ]:
 
 
 from ray.util.dask import ray_dask_get, enable_dask_on_ray, disable_dask_on_ray
@@ -161,10 +161,10 @@ import pandas as pd
 # In[ ]:
 
 
+#tag::dask_on_ray[]
 
 
-
-# In[22]:
+# In[ ]:
 
 
 import dask
@@ -173,40 +173,52 @@ import dask
 # In[ ]:
 
 
-# ray.data.dataset.Dataset.to_dask
+enable_dask_on_ray()
 
 
-# In[23]:
+# In[ ]:
 
 
 ddf_students = ray.data.dataset.Dataset.to_dask(ray_dataset) 
 
 
-# In[26]:
+# In[ ]:
 
 
 ddf_students.head()
 
 
-# In[60]:
+# In[ ]:
+
+
+disable_dask_on_ray()
+
+
+# In[ ]:
+
+
+#end::dask_on_ray[]
+
+
+# In[ ]:
 
 
 from ray.util.dask import ray_dask_get
 
 
-# In[87]:
+# In[ ]:
 
 
 dask.config.get
 
 
-# In[88]:
+# In[ ]:
 
 
 dsk_config_dump = dask.config.config.get('distributed')
 
 
-# In[91]:
+# In[ ]:
 
 
 dsk_config_dump.get('dashboard').get('link')
@@ -242,50 +254,50 @@ dsk_config_dump.get('dashboard').get('link')
 # larger dataset
 
 
-# In[34]:
+# In[ ]:
 
 
 url = "https://gender-pay-gap.service.gov.uk/viewing/download-data/2021"
 from pyspark import SparkFiles
 
 
-# In[35]:
+# In[ ]:
 
 
 spark.sparkContext.addFile(url)
 
 
-# In[36]:
+# In[ ]:
 
 
 
 
 
-# In[40]:
+# In[ ]:
 
 
 df = spark.read.csv("file://"+SparkFiles.get("2021"), header=True, inferSchema= True)
 
 
-# In[47]:
+# In[ ]:
 
 
 df.show(3)
 
 
-# In[42]:
+# In[ ]:
 
 
 ray_dataset = ray.data.from_spark(df)
 
 
-# In[46]:
+# In[ ]:
 
 
 ray_dataset.show(3)
 
 
-# In[49]:
+# In[ ]:
 
 
 from dask.distributed import Client
@@ -298,31 +310,31 @@ client = Client()
 
 
 
-# In[51]:
+# In[ ]:
 
 
 ddf_pay = ray.data.dataset.Dataset.to_dask(ray_dataset) 
 
 
-# In[52]:
+# In[ ]:
 
 
 ddf_pay.compute()
 
 
-# In[45]:
+# In[ ]:
 
 
 ddf_pay.head(3)
 
 
-# In[50]:
+# In[ ]:
 
 
 
 
 
-# In[54]:
+# In[ ]:
 
 
 def fillna(df):
@@ -331,13 +343,13 @@ def fillna(df):
 new_df = ddf_pay.map_partitions(fillna)
 
 
-# In[55]:
+# In[ ]:
 
 
 new_df.compute()
 
 
-# In[56]:
+# In[ ]:
 
 
 # Since there could be an NA in the index clear the partition / division information
@@ -346,13 +358,13 @@ new_df.compute()
 narrow_df = new_df[["PostCode", "EmployerSize", "DiffMeanHourlyPercent"]]
 
 
-# In[57]:
+# In[ ]:
 
 
 grouped_df = narrow_df.groupby("PostCode")
 
 
-# In[59]:
+# In[ ]:
 
 
 avg_by_postalcode = grouped_df.mean()
