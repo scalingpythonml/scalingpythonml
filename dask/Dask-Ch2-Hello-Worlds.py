@@ -43,8 +43,20 @@ d
 # In[ ]:
 
 
+
+
+
+# In[ ]:
+
+
 f = client.submit(d)
 f
+
+
+# In[ ]:
+
+
+client.compute(dask.delayed(slow_task)(1))
 
 
 # In[ ]:

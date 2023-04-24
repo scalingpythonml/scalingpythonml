@@ -57,13 +57,20 @@ client = Client(cluster)
 # In[ ]:
 
 
+#tag::dask_task_dependencies[]
+@dask.delayed()
+def string_magic(x, y):
+    lower_x = x.lower()
+    lower_y = y.lower()
+    return (lower_x in lower_y) or (lower_y in lower_x)
 
+@dask.delayed()
+def gen(x):
+    return x
 
-
-# In[ ]:
-
-
-
+f = gen("farts")
+compute = string_magic(f, f)
+#end::dask_task_dependencies[]
 
 
 # In[ ]:
@@ -96,6 +103,12 @@ dask_time = timeit.timeit(lambda: dask_fib(14), number=1)
 memoized_time = timeit.timeit(lambda: fib(14), number=1)
 print("In sequence {}, in parallel {}, memoized".format(seq_time, dask_time, memoized_time))
 #end::fib_task_hello_world[]
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
