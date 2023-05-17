@@ -408,6 +408,82 @@ rolling_avg = partitioned_df.map_overlap(
 rolling_avg.compute()
 
 
+# In[2]:
+
+
+
+
+
+# In[5]:
+
+
+
+
+
+# In[ ]:
+
+
+#tag::ex_read_SQL_Dataframe[]
+from sqlite3 import connect
+from sqlalchemy import sql
+import dask.dataframe as dd
+
+#sqlite connection
+db_conn = "sqlite://fake_school.sql"
+db = connect(db_conn)
+
+col_student_num = sql.column("student_number")
+col_grade = sql.column("grade")
+tbl_transcript = sql.table("transcripts")
+
+select_statement = sql.select([col_student_num,
+                              col_grade]
+                             ).select_from(tbl_transcript)
+
+#read from sql db
+ddf = dd.read_sql_query(select_stmt,
+                       npartitions=4,
+                       index_col=col_student_num,
+                       con=db_conn)
+
+#alternatively, read whole table
+ddf = dd.read_sql_table("transcripts",
+                       db_conn,
+                       index_col="student_number",
+                       npartitions=4
+                       )
+
+#do_some_ETL...
+
+#save to db
+ddf.to_sql("transcript_analytics",
+          uri=db_conn,
+          if_exists='replace',
+          schema=None,
+          index=False
+          )
+
+#end::ex_read_SQL_Dataframe[]
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
 # In[ ]:
 
 
