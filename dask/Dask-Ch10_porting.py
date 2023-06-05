@@ -193,7 +193,7 @@ from fugue_notebook import setup
 
 setup(is_lab=True)
 
-get_ipython().run_line_magic('%fsql', 'dask')
+%%fsql dask
 tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID
 
 SELECT *
@@ -222,7 +222,7 @@ df = dd.read_parquet(url)
 # In[ ]:
 
 
-get_ipython().run_cell_magic('fsql', 'dask', 'tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID\n\nSELECT *\nFROM tempdf\nORDER BY average_fare DESC\nLIMIT 5\nPRINT\n')
+get_ipython().run_cell_magic('fsql', 'dask', 'tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID\n\nSELECT *\nFROM tempdf\nORDER BY average_fare DESC\nLIMIT 5\nPRINT')
 
 
 # In[ ]:
