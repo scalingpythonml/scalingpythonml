@@ -1,0 +1,8 @@
+apiVersion: kubernetes.dask.org/v1
+kind: DaskAutoscaler
+metadata:
+  name: simple
+spec:
+  cluster: "simple"
+  minimum: 0 # This will scale down lower, but means that your first job after scale down takes longer.
+  maximum: 10

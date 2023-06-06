@@ -1,0 +1,26 @@
+apiVersion: kubernetes.dask.org/v1
+kind: DaskWorkerGroup
+metadata:
+  name: highmem
+spec:
+  cluster: simple
+  worker:
+    replicas: 0
+    spec:
+      containers:
+      - name: worker
+        image: "holdenk/dask-extended:latest"
+# You might want to use the official one, we can't because ARM.
+#        image: "ghcr.io/dask/dask:latest"
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          requests:
+            memory: "30Gi"
+          limits:
+            memory: "30Gi"
+        args:
+          - dask-worker
+          - --name
+          - $(DASK_WORKER_NAME)
+          - --resources
+          - MEMORY=30e9
