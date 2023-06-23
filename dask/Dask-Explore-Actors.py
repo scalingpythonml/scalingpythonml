@@ -14,15 +14,17 @@ from dask_kubernetes import KubeCluster, make_pod_spec
 
 dask.config.set({"kubernetes.scheduler-service-type": "LoadBalancer"})
 worker_template = make_pod_spec(image='holdenk/dask:latest',
-                         memory_limit='8G', memory_request='8G',
-                         cpu_limit=1, cpu_request=1)
+                                memory_limit='8G', memory_request='8G',
+                                cpu_limit=1, cpu_request=1)
 scheduler_template = make_pod_spec(image='holdenk/dask:latest',
-                         memory_limit='4G', memory_request='4G',
-                         cpu_limit=1, cpu_request=1)
+                                   memory_limit='4G', memory_request='4G',
+                                   cpu_limit=1, cpu_request=1)
 cluster = None
 distributed = False
 if distributed:
-    cluster = KubeCluster(pod_template = worker_template, scheduler_pod_template = scheduler_template)
+    cluster = KubeCluster(
+        pod_template=worker_template,
+        scheduler_pod_template=scheduler_template)
     cluster.adapt()    # or create and destroy workers dynamically based on workload
 else:
     from dask.distributed import LocalCluster
@@ -71,13 +73,13 @@ class Counter:
     def add(self, x):
         self.n += x
         return self.n
-    
+
     def value(self):
         return self.n
 
 
 future = client.submit(Counter, actor=True)  # Create a Counter on a worker
-counter = future.result()     
+counter = future.result()
 
 
 # In[ ]:
@@ -115,7 +117,8 @@ def inc(x):
     f = counter.add(x)
     # Note: the actor (in this case `counter`) is serelizable, however the future we get back from it is not
     # this is likely because the future contains a network connection to the actor, so need to get it's
-    # concrete value here. If we don't need the value you can avoid blocking and it will still execute.
+    # concrete value here. If we don't need the value you can avoid blocking
+    # and it will still execute.
     return f.result()
 #end::result_future_not_ser[]
 
@@ -178,7 +181,8 @@ class BankAccount:
         return self._balance
 
 
-account_future = client.submit(BankAccount, actor=True)  # Create a BankAccount on a worker
+# Create a BankAccount on a worker
+account_future = client.submit(BankAccount, actor=True)
 account = account_future.result()
 #end::make_account[]
 
@@ -219,9 +223,9 @@ class SketchyBank:
     """ A sketchy bank (handles mutliple accounts in one actor)."""
 
     # 42 is a good start
-    def __init__(self, accounts = {} ):
+    def __init__(self, accounts={}):
         self._accounts = accounts
-        
+
     def create_account(self, key):
         if key in self._accounts:
             raise Exception(f"{key} is already an account.")
@@ -251,32 +255,30 @@ class SketchyBank:
 
 class HashActorPool:
     """A basic determinstic actor pool."""
-    
+
     def __init__(self, actorClass, num):
         self._num = num
         # Make the request number of actors
         self._actors = list(
             map(lambda x: client.submit(SketchyBank, actor=True).result(),
                 range(0, num)))
-        
+
     def actor_for_key(self, key):
-        return self._actors[ hash(key) % self._num ]
+        return self._actors[hash(key) % self._num]
 
 
 holdens_questionable_bank = HashActorPool(SketchyBank, 10)
 holdens_questionable_bank.actor_for_key("timbit").create_account("timbit")
-holdens_questionable_bank.actor_for_key("timbit").deposit("timbit", 42.0).result()
+holdens_questionable_bank.actor_for_key(
+    "timbit").deposit("timbit", 42.0).result()
 #end::make_sketchy_bank[]
 
 
 # In[ ]:
 
 
-holdens_questionable_bank.actor_for_key("timbit").deposit("timbit", 42.0).result()
+holdens_questionable_bank.actor_for_key(
+    "timbit").deposit("timbit", 42.0).result()
 
 
 # In[ ]:
-
-
-
-

@@ -35,7 +35,7 @@ import pyspark
 #     pyspark.SparkConf()
 # #         .master('spark://xxx.xxx.xx.xx:7077') \
 #         .setMaster('local[{}]'.format(number_cores)) \
-#         .set('spark.driver.memory', '{}g'.format(memory_gb))        
+#         .set('spark.driver.memory', '{}g'.format(memory_gb))
 # )
 # sc = pyspark.SparkContext(conf=conf)
 # # sqlContext = SQLContext(sc)
@@ -46,21 +46,18 @@ import pyspark
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
 import raydp
-import ray 
+import ray
 
 ray.init()
 spark = raydp.init_spark(
-  app_name = "raydp_spark",
-  num_executors = 1,
-  executor_cores = 1,
-  executor_memory = "4GB"
+    app_name="raydp_spark",
+    num_executors=1,
+    executor_cores=1,
+    executor_memory="4GB"
 )
 
 
@@ -75,13 +72,10 @@ enable_dask_on_ray()
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
-df = spark.createDataFrame(["Anna","Bob","Sue"], "string").toDF("firstname")
+df = spark.createDataFrame(["Anna", "Bob", "Sue"], "string").toDF("firstname")
 
 
 # In[ ]:
@@ -93,16 +87,30 @@ df.show()
 # In[ ]:
 
 
-names = ["Anna", "Bob", "Liam", "Olivia", "Noah", "Emma", "Oliver", "Ava", "Elijah", "Charlotte"]
+names = [
+    "Anna",
+    "Bob",
+    "Liam",
+    "Olivia",
+    "Noah",
+    "Emma",
+    "Oliver",
+    "Ava",
+    "Elijah",
+    "Charlotte"]
+
+
 class StudentRecord:
     def __init__(self, record_id, name):
         self.record_id = record_id
         self.name = name
+
     def __str__(self):
         return f'StudentRecord(record_id={self.record_id},data={self.name})'
-    
+
+
 num_records = len(names)
-student_records = [StudentRecord(i, f'{names[i]}') for i in range(num_records)] 
+student_records = [StudentRecord(i, f'{names[i]}') for i in range(num_records)]
 
 
 # In[ ]:
@@ -126,13 +134,7 @@ df.show()
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -178,7 +180,7 @@ enable_dask_on_ray()
 # In[ ]:
 
 
-ddf_students = ray.data.dataset.Dataset.to_dask(ray_dataset) 
+ddf_students = ray.data.dataset.Dataset.to_dask(ray_dataset)
 
 
 # In[ ]:
@@ -226,13 +228,7 @@ dsk_config_dump.get('dashboard').get('link')
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -242,9 +238,6 @@ dsk_config_dump.get('dashboard').get('link')
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -269,13 +262,14 @@ spark.sparkContext.addFile(url)
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
-df = spark.read.csv("file://"+SparkFiles.get("2021"), header=True, inferSchema= True)
+df = spark.read.csv(
+    "file://" +
+    SparkFiles.get("2021"),
+    header=True,
+    inferSchema=True)
 
 
 # In[ ]:
@@ -306,13 +300,10 @@ client = Client()
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
-ddf_pay = ray.data.dataset.Dataset.to_dask(ray_dataset) 
+ddf_pay = ray.data.dataset.Dataset.to_dask(ray_dataset)
 
 
 # In[ ]:
@@ -330,15 +321,13 @@ ddf_pay.head(3)
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
 def fillna(df):
     return df.fillna(value={"PostCode": "UNKNOWN"}).fillna(value=0)
-    
+
+
 new_df = ddf_pay.map_partitions(fillna)
 
 
@@ -351,7 +340,8 @@ new_df.compute()
 # In[ ]:
 
 
-# Since there could be an NA in the index clear the partition / division information
+# Since there could be an NA in the index clear the partition / division
+# information
 new_df.clear_divisions()
 new_df.compute()
 narrow_df = new_df[["PostCode", "EmployerSize", "DiffMeanHourlyPercent"]]
@@ -375,37 +365,19 @@ avg_by_postalcode.compute()
 # In[ ]:
 
 
-
+# In[ ]:
 
 
 # In[ ]:
 
 
-
+# In[ ]:
 
 
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -418,4 +390,3 @@ sc.stop()
 
 
 sqlContext.stop()
-

@@ -11,13 +11,7 @@ from dask.distributed import Client
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -28,16 +22,20 @@ import threading, sys, time
 
 main_thread = threading.get_ident()
 
+
 def print_frame(frame, event):
     print(frame, event)
     return print_frame
 
+
 current_frame = sys._getframe().f_trace = print_frame
+
 
 def print_frame():
     frame = sys._current_frames()[main_thread]
     print frame
-    
+
+
 def print_worker_config():
     return dask.config.get("distributed.worker.use-file-locking")
 #end::ex_monitor_distributed_threads[]
@@ -46,15 +44,10 @@ def print_worker_config():
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
 from dask.distributed import Client
 from dask.distributed import LocalCluster
-cluster = LocalCluster(n_workers=10) 
+cluster = LocalCluster(n_workers=10)
 client = Client(cluster)
 client
 
@@ -69,9 +62,6 @@ import numpy as np
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
@@ -79,9 +69,12 @@ import numpy as np
 from dask.distributed import performance_report
 
 with performance_report(filename="computation_report.html"):
-    gnarl = da.random.beta(1,2, size=(10000, 10000, 10), chunks=(1000,1000,5))
+    gnarl = da.random.beta(
+        1, 2, size=(
+            10000, 10000, 10), chunks=(
+            1000, 1000, 5))
     x = da.random.random((10000, 10000, 10), chunks=(1000, 1000, 5))
-    y = (da.arccos(x)*gnarl).sum(axis=(1,2))
+    y = (da.arccos(x) * gnarl).sum(axis=(1, 2))
     y.compute()
 #end::ex_generate_performance_report[]
 
@@ -93,14 +86,25 @@ with performance_report(filename="computation_report.html"):
 from dask.distributed import get_task_stream
 
 with get_task_stream() as ts:
-    gnarl = da.random.beta(1,2, size=(100, 100, 10), chunks=(100,100,5))
+    gnarl = da.random.beta(1, 2, size=(100, 100, 10), chunks=(100, 100, 5))
     x = da.random.random((100, 100, 10), chunks=(100, 100, 5))
-    y = (da.arccos(x)*gnarl).sum(axis=(1,2))
+    y = (da.arccos(x) * gnarl).sum(axis=(1, 2))
     y.compute()
 history = ts.data
 
 #display the task stream data as dataframe
-history_frame = pd.DataFrame(history, columns = ['worker','status','nbytes', 'thread', 'type', 'typename', 'metadata', 'startstops', 'key'])
+history_frame = pd.DataFrame(
+    history,
+    columns=[
+        'worker',
+        'status',
+        'nbytes',
+        'thread',
+        'type',
+        'typename',
+        'metadata',
+        'startstops',
+        'key'])
 
 #plot task stream
 ts.figure
@@ -108,9 +112,6 @@ ts.figure
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -127,15 +128,15 @@ client = Client(cluster)
 ms = MemorySampler()
 
 #some gnarly compute
-gnarl = da.random.beta(1,2, size=(100, 100, 10), chunks=(100,100,5))
+gnarl = da.random.beta(1, 2, size=(100, 100, 10), chunks=(100, 100, 5))
 x = da.random.random((100, 100, 10), chunks=(100, 100, 5))
-y = (da.arccos(x)*gnarl).sum(axis=(1,2))
-    
+y = (da.arccos(x) * gnarl).sum(axis=(1, 2))
+
 with ms.sample("memory without adaptive clusters"):
     y.compute()
 
 #enable adaptive scaling
-cluster.adapt(minimum=0, maximum=100) 
+cluster.adapt(minimum=0, maximum=100)
 
 with ms.sample("memory with adaptive clusters"):
     y.compute()
@@ -157,9 +158,10 @@ from dask.distributed import Client
 #we give walltime of 4 hours to the cluster spawn
 #each Dask workers are told they have 5 min less than that for Dask to manage
 #we tell workers to stagger their start and close in a random interval of 5min
-#some workers will die, but others will be staggered alive, avoiding loss of job
+# some workers will die, but others will be staggered alive, avoiding loss
+# of job
 
-cluster = SLURMCluster(    
+cluster = SLURMCluster(
     walltime="04:00:00",
     cores=24,
     processes=6
@@ -191,7 +193,9 @@ import time
 
 logger = logging.getLogger(__name__)
 
-WORKER_ENV = {"HADOOP_CONF_DIR": "/data/app/spark-yarn/hadoop-conf", "JAVA_HOME": "/usr/lib/jvm/java"}
+WORKER_ENV = {
+    "HADOOP_CONF_DIR": "/data/app/spark-yarn/hadoop-conf",
+    "JAVA_HOME": "/usr/lib/jvm/java"}
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -208,11 +212,17 @@ cluster = YarnCluster(
     worker_vcores=2,
     worker_memory="4GiB")
 
-logger.info("Initialising YarnCluster: done in %.4f", time.time() - cluster_start_time)
+logger.info(
+    "Initialising YarnCluster: done in %.4f",
+    time.time() -
+    cluster_start_time)
 
 logger.info("Initialising Client")
 client = Client(cluster)
-logger.info("Initialising Client: done in %.4f", time.time() - client_start_time)
+logger.info(
+    "Initialising Client: done in %.4f",
+    time.time() -
+    client_start_time)
 
 # Important and common misconfig is to not have node's versions match
 versions = dask_client.get_versions(check=True)
@@ -225,12 +235,16 @@ versions = dask_client.get_versions(check=True)
 
 #tag::ex_yarn_deployment_CLI_tuning[]
 get_ipython().system('dask-yarn submit')
-  --environment home/mkimmins/anaconda/bin/python   --worker-count 20   --worker-vcores 2   --worker-memory 4GiB   your_python_script.py
+
+'''
+--environment home/username/anaconda/bin/python --worker-count 20 \
+--worker-vcores 2 --worker-memory 4GiB your_python_script.py
+'''
 
 # Since we already deployed and ran YARN cluster,
 # we replace YarnCluster(...) with from_current() to reference it
 cluster = YarnCluster.from_current()
-    
+
 # This would give you YARN application ID
 # application_1516806604516_0019
 # status check, kill, view log of application
@@ -248,19 +262,23 @@ get_ipython().system('yarn logs -applicationId application_1516806604516_0019')
 from dask_jobqueue import SLURMCluster
 from dask.distributed import Client
 
-def create_slurm_clusters(cores, processes, workers, memory="16GB", queue='regular', account="slurm_account", username="mkimmins"):
+
+def create_slurm_clusters(cores, processes, workers, memory="16GB",
+                          queue='regular', account="slurm_account", username="mkimmins"):
     cluster = SLURMCluster(
-        #ensure walltime request is reasonable within your specific cluster    
+        #ensure walltime request is reasonable within your specific cluster
         walltime="04:00:00",
         queue=queue,
-        account=account,        
+        account=account,
         cores=cores,
         processes=processes,
         memory=memory,
         worker_extra_args=["--resources GPU=1"],
         job_extra=['--gres=gpu:1'],
         job_directives_skip=['--mem', 'another-string'],
-        job_script_prologue = ['/your_path/pre_run_script.sh', 'source venv/bin/activate'],
+        job_script_prologue=[
+            '/your_path/pre_run_script.sh',
+            'source venv/bin/activate'],
         interface='ib0',
         log_directory='dask_slurm_logs',
         python=f'srun -n 1 -c {processes} python',
@@ -269,6 +287,7 @@ def create_slurm_clusters(cores, processes, workers, memory="16GB", queue='regul
     )
     cluster.start_workers(workers)
     return cluster
+
 
 cluster = create_slurm_clusters(cores=4, processes=1, workers=4)
 cluster.scale(10)
@@ -283,7 +302,8 @@ client = Client(cluster)
 import time
 from dask import delayed
 from dask.distributed import Client, LocalCluster
-# Note we introduce progress bar for future execution in a distributed context here
+# Note we introduce progress bar for future execution in a distributed
+# context here
 from dask.distributed import progress
 from dask_jobqueue import SLURMCluster
 import numpy as np
@@ -294,16 +314,19 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
+
 def visit_url(i):
     return "Some fancy operation happened. Trust me."
+
 
 @delayed
 def crawl(url, depth=0, maxdepth=1, maxlinks=4):
     # some complicated and async job
-    # refer to chapter 2 for full implementation of crawl    
+    # refer to chapter 2 for full implementation of crawl
     time.sleep(1)
     some_output = visit_url(url)
     return some_output
+
 
 def main_event(client):
     njobs = 100
@@ -318,11 +341,13 @@ def main_event(client):
     logger.info(f"Running main loop...")
     progress(results)
 
+
 def cli():
     cluster = create_slurm_clusters(cores=10, processes=10, workers=2)
     logger.info(f"Submitting SLURM job with jobscript: {cluster.job_script()}")
     client = Client(cluster)
-    main_event(client)    
+    main_event(client)
+
 
 if __name__ == "__main__":
     logger.info("Initialising SLURM Cluster")
@@ -331,9 +356,6 @@ if __name__ == "__main__":
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -346,4 +368,3 @@ cluster.close()
 
 
 client.close()
-

@@ -15,7 +15,8 @@ import dask
 from dask_cuda import LocalCUDACluster
 from dask.distributed import Client
 #NOTE: The resources= flag is important, by default the LocalCUDACluster *does not* label any resources which can make
-# porting your code to a cluster where some workers have GPUs and some not painful.
+# porting your code to a cluster where some workers have GPUs and some not
+# painful.
 cluster = LocalCUDACluster(resources={"GPU": 1})
 client = Client(cluster)
 #end::dask_local_gpu[]
@@ -32,7 +33,7 @@ cluster
 
 def how_many_gpus(x):
     import torch
-    return torch.cuda.device_count(); 
+    return torch.cuda.device_count()
 
 
 # In[ ]:
@@ -86,6 +87,7 @@ def delayed_move_mean(a, window_arr, out):
         asum += a[i] - a[i - window_width]
         out[i] = asum / count
 
+
 arr = np.arange(20, dtype=np.float64).reshape(2, 10)
 print(arr)
 print(dask.compute(delayed_move_mean(arr, 3)))
@@ -110,9 +112,11 @@ def move_mean(a, window_arr, out):
         asum += a[i] - a[i - window_width]
         out[i] = asum / count
 
+
 arr = np.arange(20, dtype=np.float64).reshape(2, 10)
 print(arr)
 print(move_mean(arr, 3))
+
 
 def wrapped_move_mean(*args):
     return move_mean(*args)
@@ -149,7 +153,8 @@ bc = BlazingContext(dask_client=client)
 # In[ ]:
 
 
-df = cudf.DataFrame({chr(x): cudf.Series(np.arange(4172, dtype="float64")) for x in range(65, 66)})
+df = cudf.DataFrame({chr(x): cudf.Series(
+    np.arange(4172, dtype="float64")) for x in range(65, 66)})
 
 import dask_cudf
 
@@ -182,8 +187,12 @@ cluster.adapt(minimum=1, maximum=10)
 
 def noop(x):
     return True
+
+
 test_no_gpu_future = client.submit(noop, 1)
-test_gpu_future = client.submit(noop, 1, resources={'GPU': 2, 'MEMORY': 70e100})
+test_gpu_future = client.submit(
+    noop, 1, resources={
+        'GPU': 2, 'MEMORY': 70e100})
 
 
 # In[ ]:
@@ -193,7 +202,7 @@ test_gpu_future = client.submit(noop, 1, resources={'GPU': 2, 'MEMORY': 70e100})
 client.gather(test_no_gpu_future)
 # We might take some time for the task to finish
 time.sleep(1)
-if 
+if
 
 
 # In[ ]:
@@ -221,7 +230,3 @@ cluster
 
 
 # In[ ]:
-
-
-
-

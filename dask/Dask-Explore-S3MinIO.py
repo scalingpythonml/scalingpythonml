@@ -20,7 +20,9 @@ import pyarrow
 # In[3]:
 
 
-cluster = KubeCluster.from_yaml('worker-spec.yaml', namespace='dask') # deploy_mode='remote')
+cluster = KubeCluster.from_yaml(
+    'worker-spec.yaml',
+    namespace='dask') # deploy_mode='remote')
 
 
 # In[4]:
@@ -64,7 +66,7 @@ print(array.mean().compute())  # Should print 1.0|
 
 # The anon false wasted so much time
 minio_storage_options = {
-#    "anon": "false",
+    #    "anon": "false",
     "key": "YOURACCESSKEY",
     "secret": "YOURSECRETKEY",
     "client_kwargs": {
@@ -99,21 +101,18 @@ import dask.dataframe as dd
 # In[10]:
 
 
-current_date=datetime.datetime(2020,10,1, 1)
+current_date = datetime.datetime(2020, 10, 1, 1)
 
 
 # In[11]:
-
-
-
 
 
 # In[12]:
 
 
 #tag::make_file_list[]
-gh_archive_files=[]
-while current_date < datetime.datetime.now() -  datetime.timedelta(days=1):
+gh_archive_files = []
+while current_date < datetime.datetime.now() - datetime.timedelta(days=1):
     current_date = current_date + datetime.timedelta(hours=1)
     datestring = f'{current_date.year}-{current_date.month:02}-{current_date.day:02}-{current_date.hour}'
     gh_url = f'http://data.githubarchive.org/{datestring}.json.gz'
@@ -188,7 +187,8 @@ j
 j.name
 
 
-# Since we want to partition on the repo name, we need to extract that to it's own column
+# Since we want to partition on the repo name, we need to extract that to
+# it's own column
 
 # In[21]:
 
@@ -199,7 +199,8 @@ data_bag = df.to_bag()
 # In[22]:
 
 
-# The records returned by the bag are tuples not named tuples, so use the df columns to look up the tuple index
+# The records returned by the bag are tuples not named tuples, so use the
+# df columns to look up the tuple index
 cols = df.columns
 
 
@@ -217,6 +218,8 @@ def parse_record(record):
     return r
 
 #tag::cleanup[]
+
+
 def clean_record(record):
     r = {
         "repo": record[cols.get_loc("repo")],
@@ -226,6 +229,7 @@ def clean_record(record):
         "created_at": record[cols.get_loc("created_at")],
         "payload": record[cols.get_loc("payload")]}
     return r
+
 
 cleaned_up_bag = data_bag.map(clean_record)
 res = cleaned_up_bag.to_dataframe()
@@ -269,21 +273,32 @@ type(h_parsed.iloc[0]["repo"])
 # In[29]:
 
 
-#to_csv brings it back locally, lets try parquet. csv doesn't handle nesting so well so use original json inside
-df.to_csv("s3://dask-test/boop-test-csv", storage_options=minio_storage_options)
+# to_csv brings it back locally, lets try parquet. csv doesn't handle
+# nesting so well so use original json inside
+df.to_csv("s3://dask-test/boop-test-csv",
+          storage_options=minio_storage_options)
 
 
 # In[30]:
 
 
-# This will probably still bring everything back to the client? I'm guessing though.
-res.to_parquet("s3://dask-test/boop-test-pq", compression="gzip", storage_options=minio_storage_options, engine="pyarrow")
+# This will probably still bring everything back to the client? I'm
+# guessing though.
+res.to_parquet(
+    "s3://dask-test/boop-test-pq",
+    compression="gzip",
+    storage_options=minio_storage_options,
+    engine="pyarrow")
 
 
 # In[31]:
 
 
-parsed_res.to_parquet("s3://dask-test/boop-test-pq-p-nested", compression="gzip", storage_options=minio_storage_options, engine="fastparquet")
+parsed_res.to_parquet(
+    "s3://dask-test/boop-test-pq-p-nested",
+    compression="gzip",
+    storage_options=minio_storage_options,
+    engine="fastparquet")
 
 
 # In[ ]:
@@ -291,14 +306,12 @@ parsed_res.to_parquet("s3://dask-test/boop-test-pq-p-nested", compression="gzip"
 
 #tag::write[]
 res.to_parquet("s3://dask-test/boop-test-partioned",
-              partition_on=["type", "repo_name"], # Based on " there will be no global groupby." I think this is the value we want.
-              compression="gzip",
-              storage_options=minio_storage_options, engine="pyarrow")
+               # Based on " there will be no global groupby." I think this is
+               # the value we want.
+               partition_on=["type", "repo_name"],
+               compression="gzip",
+               storage_options=minio_storage_options, engine="pyarrow")
 #end::write[]
 
 
 # In[ ]:
-
-
-
-

@@ -39,7 +39,7 @@ df = dd.read_csv(
 try:
     df.compute() # Observe the failure
 except Exception as e:
-        print(e)
+    print(e)
 # - CompanyNumber
 #  ValueError("invalid literal for int() with base 10: 'SC312912'")
 #end::ex_load_uk_gender_pay_gap_infered
@@ -82,9 +82,11 @@ known_implementations
 #tag::filna_ex[]
 def fillna(df):
     return df.fillna(value={"PostCode": "UNKNOWN"}).fillna(value=0)
-    
+
+
 new_df = df.map_partitions(fillna)
-# Since there could be an NA in the index clear the partition / division information
+# Since there could be an NA in the index clear the partition / division
+# information
 new_df.clear_divisions()
 #end::filna_ex[]
 
@@ -136,8 +138,13 @@ len(list(ops_by_postcalcode.partitions))
 # In[ ]:
 
 
-# Le sad, you can see this doesn't actually respect the partition size of one byte.
-dask.visualize(narrow_df.set_index("PostCode", npartitions="auto", partition_size=1))
+# Le sad, you can see this doesn't actually respect the partition size of
+# one byte.
+dask.visualize(
+    narrow_df.set_index(
+        "PostCode",
+        npartitions="auto",
+        partition_size=1))
 
 
 # In[ ]:
@@ -147,7 +154,9 @@ indexed = narrow_df.set_index("PostCode")
 #tag::repartition[]
 reparted = indexed.repartition(partition_size="20kb")
 #end::repartition[]
-dask.visualize(narrow_df.set_index("PostCode").repartition(partition_size="20kb"))
+dask.visualize(
+    narrow_df.set_index("PostCode").repartition(
+        partition_size="20kb"))
 
 
 # In[ ]:
@@ -170,7 +179,7 @@ fast_grouped_df.mean().compute()
 def update_empsize_to_median(df):
     def to_median(value):
         if " to " in value:
-            f , t = value.replace(",", "").split(" to ")
+            f, t = value.replace(",", "").split(" to ")
             return (int(f) + int(t)) / 2.0
         elif "Less than" in value:
             return 100
@@ -186,9 +195,6 @@ df_with_median_emp_size = narrow_df.map_partitions(update_empsize_to_median)
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
@@ -201,8 +207,11 @@ df_with_median_emp_size.head(1)
 def join_emp_with_diff(df):
     # In practice life would be easier if we multiplied these together but to illustrate
     # the custom aggregate we'll make this a tuple for now
-    df["empsize_diff"] = list(df[["EmployerSize", "DiffMeanHourlyPercent"]].to_records(index=False))
+    df["empsize_diff"] = list(
+        df[["EmployerSize", "DiffMeanHourlyPercent"]].to_records(index=False))
     return df
+
+
 df_diff_with_emp_size = df_with_median_emp_size.map_partitions(
     join_emp_with_diff)
 df_diff_with_emp_size.head(1)
@@ -212,19 +221,22 @@ df_diff_with_emp_size.head(1)
 
 
 #tag::custom_agg[]
-# Write a custom weighted mean, we get either a DataFrameGroupBy 
+# Write a custom weighted mean, we get either a DataFrameGroupBy
 # with multiple columns or SeriesGroupBy for each chunk
 def process_chunk(chunk):
     def weighted_func(df):
         return (df["EmployerSize"] * df["DiffMeanHourlyPercent"]).sum()
     return (chunk.apply(weighted_func), chunk.sum()["EmployerSize"])
-        
+
+
 def agg(total, weights):
     return (total.sum(), weights.sum())
 
+
 def finalize(total, weights):
     return total / weights
-    
+
+
 weighted_mean = dd.Aggregation(
     name='weighted_mean',
     chunk=process_chunk,
@@ -270,7 +282,7 @@ aggregated.head(4)
 
 
 # For loading data example the note here is that whatever params we pass through read_x
-# if not consumed by dask (e.g. blocksize is used by Dask), 
+# if not consumed by dask (e.g. blocksize is used by Dask),
 # More generally all of Dask's DataFrame functions follow this pattern.
 sf_covid_df = dd.read_csv("https://data.sfgov.org/api/views/gqw3-444p/rows.csv?accessType=DOWNLOAD", blocksize=None, dtype={
     'pct_tot_new_cases': 'float64',
@@ -337,7 +349,8 @@ mini_sf_covid_df.index
 # In[ ]:
 
 
-indexed_df = mini_sf_covid_df.set_index('specimen_collection_date', npartitions=5)
+indexed_df = mini_sf_covid_df.set_index(
+    'specimen_collection_date', npartitions=5)
 indexed_df.head(1)
 
 
@@ -395,6 +408,7 @@ partitioned_df.divisions
 def process_overlap_window(df):
     return df.rolling('5D').mean()
 
+
 rolling_avg = partitioned_df.map_overlap(
     process_overlap_window,
     pd.Timedelta('5D'),
@@ -411,13 +425,7 @@ rolling_avg.compute()
 # In[2]:
 
 
-
-
-
 # In[5]:
-
-
-
 
 
 # In[ ]:
@@ -438,30 +446,30 @@ tbl_transcript = sql.table("transcripts")
 
 select_statement = sql.select([col_student_num,
                               col_grade]
-                             ).select_from(tbl_transcript)
+                              ).select_from(tbl_transcript)
 
 #read from sql db
 ddf = dd.read_sql_query(select_stmt,
-                       npartitions=4,
-                       index_col=col_student_num,
-                       con=db_conn)
+                        npartitions=4,
+                        index_col=col_student_num,
+                        con=db_conn)
 
 #alternatively, read whole table
 ddf = dd.read_sql_table("transcripts",
-                       db_conn,
-                       index_col="student_number",
-                       npartitions=4
-                       )
+                        db_conn,
+                        index_col="student_number",
+                        npartitions=4
+                        )
 
 #do_some_ETL...
 
 #save to db
 ddf.to_sql("transcript_analytics",
-          uri=db_conn,
-          if_exists='replace',
-          schema=None,
-          index=False
-          )
+           uri=db_conn,
+           if_exists='replace',
+           schema=None,
+           index=False
+           )
 
 #end::ex_read_SQL_Dataframe[]
 
@@ -469,23 +477,10 @@ ddf.to_sql("transcript_analytics",
 # In[ ]:
 
 
-
+# In[ ]:
 
 
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
