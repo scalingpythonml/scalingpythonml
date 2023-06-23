@@ -235,7 +235,11 @@ versions = dask_client.get_versions(check=True)
 
 #tag::ex_yarn_deployment_CLI_tuning[]
 get_ipython().system('dask-yarn submit')
---environment home / mkimmins / anaconda / bin / python - -worker - count 20 - -worker - vcores 2 - -worker - memory 4GiB   your_python_script.py
+
+'''
+--environment home/username/anaconda/bin/python --worker-count 20 \
+--worker-vcores 2 --worker-memory 4GiB your_python_script.py
+'''
 
 # Since we already deployed and ran YARN cluster,
 # we replace YarnCluster(...) with from_current() to reference it
