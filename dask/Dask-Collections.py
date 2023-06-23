@@ -233,19 +233,9 @@ raw_data.take(5)
 # In[ ]:
 
 
-bag.from_sequence(
-    range(
-        0,
-        1000)).map(
-            lambda x: (
-                x,
-                x)).foldby(
-                    lambda x,
-                    y: x +
-                    y,
-                    lambda x,
-                    y: x +
-    y)
+bag.from_sequence(range(0,1000))
+    .map(lambda x: (x, x))
+    .foldby(lambda x, y: x + y, lambda x, y: x + y)
 
 
 # In[ ]:
