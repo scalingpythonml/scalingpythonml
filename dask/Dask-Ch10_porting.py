@@ -40,9 +40,6 @@ client = Client(cluster)
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
@@ -60,15 +57,13 @@ cluster.scale(jobs=SLURM_JOB_COUNT)  # ask for N jobs from SLURM
 
 client = Client(cluster)
 
-cluster.adapt(minimum_jobs=10, maximum_jobs=100)  # auto-scale between 10 and 100 jobs
+# auto-scale between 10 and 100 jobs
+cluster.adapt(minimum_jobs=10, maximum_jobs=100)
 cluster.adapt(maximum_memory="10 TB")  # or use core/memory limits
 #end::ex_slurm_deployment[]
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -92,21 +87,18 @@ minio_storage_options = {
 df.to_parquet(f's3://s3_destination/{filename}',
               compression="gzip",
               storage_options=minio_storage_options,
-              engine = "fastparquet")
+              engine="fastparquet")
 
 
 df = dd.read_parquet(
-    f's3://s3_source/', 
-    storage_options=minio_storage_options, 
+    f's3://s3_source/',
+    storage_options=minio_storage_options,
     engine="pyarrow"
 )
 #end::ex_s3_minio_rw[]
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -120,13 +112,7 @@ df = dd.read_parquet(
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -141,13 +127,7 @@ df = dd.read_parquet(
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -167,9 +147,6 @@ except:
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -193,7 +170,7 @@ from fugue_notebook import setup
 
 setup(is_lab=True)
 
-%%fsql dask
+% % fsql dask
 tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID
 
 SELECT *
@@ -205,9 +182,6 @@ PRINT
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -222,13 +196,13 @@ df = dd.read_parquet(url)
 # In[ ]:
 
 
-get_ipython().run_cell_magic('fsql', 'dask', 'tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID\n\nSELECT *\nFROM tempdf\nORDER BY average_fare DESC\nLIMIT 5\nPRINT')
+get_ipython().run_cell_magic(
+    'fsql',
+    'dask',
+    'tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID\n\nSELECT *\nFROM tempdf\nORDER BY average_fare DESC\nLIMIT 5\nPRINT')
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -236,7 +210,7 @@ get_ipython().run_cell_magic('fsql', 'dask', 'tempdf = SELECT VendorID, AVG(tota
 
 #tag::ex_postgres_dataframe[]
 df = dd.read_sql_table('accounts', 'sqlite:///path/to/your.db',
-                 npartitions=10, index_col='id')  
+                       npartitions=10, index_col='id')
 #end::ex_postgres_dataframe[]
 
 
@@ -247,7 +221,7 @@ df = dd.read_sql_table('accounts', 'sqlite:///path/to/your.db',
 from dask.distributed import Client
 
 client = Client()
-client.log_event(topic = "custom_events", msg = "hello world")
+client.log_event(topic="custom_events", msg="hello world")
 client.get_events("custom_events")
 #end::ex_basic_logging[]
 
@@ -255,13 +229,7 @@ client.get_events("custom_events")
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -296,7 +264,8 @@ client = Client(cluster)  # Connect to distributed cluster and override default
 d = {'x': [3.0, 1.0, 0.2], 'y': [2.0, 0.5, 0.1], 'z': [1.0, 0.2, 0.4]}
 scores_df = dd.from_pandas(pd.DataFrame(data=d), npartitions=1)
 
-def compute_softmax(partition, axis = 0):
+
+def compute_softmax(partition, axis=0):
     """ computes the softmax of the logits
     :param logits: the vector to compute the softmax over
     :param axis: the axis we are summing over
@@ -312,8 +281,10 @@ def compute_softmax(partition, axis = 0):
     ret = e / np.sum(e, axis=axis)
     stop = timeit.default_timer()
     # partition.log_event("softmax", {"start": start, "x": x, "stop": stop})
-    dask.distributed.get_worker().log_event("softmax", {"start": start, "input": x, "stop": stop})
+    dask.distributed.get_worker().log_event(
+        "softmax", {"start": start, "input": x, "stop": stop})
     return ret
+
 
 scores_df.apply(compute_softmax, axis=1, meta=object).compute()
 client.get_events("softmax")
@@ -321,9 +292,6 @@ client.get_events("softmax")
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -336,7 +304,7 @@ client.get_events("softmax")
 
 
 # plain version of the function
-def compute_softmax(x, axis = 0):
+def compute_softmax(x, axis=0):
     """ computes the softmax of the logits
     :param logits: the vector to compute the softmax over
     :param axis: the axis we are summing over
@@ -348,20 +316,18 @@ def compute_softmax(x, axis = 0):
     e = np.exp(x - np.max(x))
     ret = e / np.sum(e, axis=axis)
     stop = timeit.default_timer()
-    dask.distributed.get_worker().log_event("softmax", {"start": start, "x": x, "stop": stop})
+    dask.distributed.get_worker().log_event(
+        "softmax", {"start": start, "x": x, "stop": stop})
     return ret
 
-scores_df.apply(compute_softmax, axis = 1, meta = object).compute()
+
+scores_df.apply(compute_softmax, axis=1, meta=object).compute()
 
 
 # In[ ]:
-
-
-
 
 
 # In[ ]:
 
 
 client.close()
-

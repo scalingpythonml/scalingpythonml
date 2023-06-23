@@ -18,14 +18,18 @@ import numpy as np
 # In[2]:
 
 
-# Specify a remote deployment using a load blanacer, necessary for communication with notebook from cluster
+# Specify a remote deployment using a load blanacer, necessary for
+# communication with notebook from cluster
 dask.config.set({"kubernetes.scheduler-service-type": "LoadBalancer"})
 
 
 # In[4]:
 
 
-cluster = KubeCluster.from_yaml('worker-spec.yaml', namespace='dask', deploy_mode='remote')
+cluster = KubeCluster.from_yaml(
+    'worker-spec.yaml',
+    namespace='dask',
+    deploy_mode='remote')
 
 
 # In[ ]:
@@ -92,11 +96,4 @@ np.take(array, indices=[0, 10]).sum().compute()
 # In[15]:
 
 
-
-
-
 # In[ ]:
-
-
-
-

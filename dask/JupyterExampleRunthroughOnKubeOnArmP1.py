@@ -19,7 +19,10 @@ dask.config.set({"kubernetes.scheduler-service-type": "LoadBalancer"})
 # In[3]:
 
 
-cluster = KubeCluster.from_yaml('worker-spec.yaml', namespace='dask', deploy_mode='remote')
+cluster = KubeCluster.from_yaml(
+    'worker-spec.yaml',
+    namespace='dask',
+    deploy_mode='remote')
 
 
 # In[4]:
@@ -82,9 +85,11 @@ np.take(array, indices=[0, 10]).sum().compute()
 
 from time import sleep
 
+
 def inc(x):
     sleep(1)
     return x + 1
+
 
 def add(x, y):
     sleep(1)
@@ -94,7 +99,10 @@ def add(x, y):
 # In[13]:
 
 
-get_ipython().run_cell_magic('time', '', '# This takes three seconds to run because we call each\n# function sequentially, one after the other\n\nx = inc(1)\ny = inc(2)\nz = add(x, y)\n')
+get_ipython().run_cell_magic(
+    'time',
+    '',
+    '# This takes three seconds to run because we call each\n# function sequentially, one after the other\n\nx = inc(1)\ny = inc(2)\nz = add(x, y)\n')
 
 
 # In[14]:
@@ -106,7 +114,10 @@ from dask import delayed
 # In[15]:
 
 
-get_ipython().run_cell_magic('time', '', '# This runs immediately, all it does is build a graph\n\nx = delayed(inc)(1)\ny = delayed(inc)(2)\nz = delayed(add)(x, y)\n')
+get_ipython().run_cell_magic(
+    'time',
+    '',
+    '# This runs immediately, all it does is build a graph\n\nx = delayed(inc)(1)\ny = delayed(inc)(2)\nz = delayed(add)(x, y)\n')
 
 
 # In[16]:
@@ -118,7 +129,7 @@ get_ipython().run_cell_magic('time', '', 'z.compute()\n')
 # In[17]:
 
 
-data = range(1,100)
+data = range(1, 100)
 
 
 # In[18]:
@@ -148,6 +159,7 @@ total.compute()
 def double(x):
     sleep(1)
     return 2 * x
+
 
 def is_even(x):
     return not x % 2
@@ -181,19 +193,19 @@ from dask import compute
 
 
 import dask.bag as db
-b = db.from_sequence(range(1,100))
+b = db.from_sequence(range(1, 100))
 
 
 # In[26]:
 
 
-iseven = lambda x: x % 2 == 0
+def iseven(x): return x % 2 == 0
 
 
 # In[27]:
 
 
-add = lambda x, y: x + y
+def add(x, y): return x + y
 
 
 # In[28]:
@@ -294,7 +306,7 @@ d = (1 - xx)**2 + 2 * (yy - xx**2)**2
 d = np.log(d)
 
 p = figure(x_range=(-5, 5), y_range=(-5, 5))
-p.image(image=[d], x=-5, y=-5, dw=10, dh=10, palette="Spectral11");
+p.image(image=[d], x=-5, y=-5, dw=10, dh=10, palette="Spectral11")
 
 
 # In[35]:
@@ -303,6 +315,7 @@ p.image(image=[d], x=-5, y=-5, dw=10, dh=10, palette="Spectral11");
 c = client
 # a simple function with interesting minima
 import time
+
 
 def rosenbrock(point):
     """Compute the rosenbrock function and return the point and result"""
@@ -385,9 +398,6 @@ client
 # In[62]:
 
 
-
-
-
 # In[63]:
 
 
@@ -395,7 +405,3 @@ f
 
 
 # In[ ]:
-
-
-
-

@@ -31,19 +31,10 @@
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
-
-
-
 # In[4]:
-
-
-
 
 
 # In[1]:
@@ -58,9 +49,9 @@
 
 from dask.distributed import Client
 # when working with clusters, specify cluster config, n_workers and worker_size
-client = Client(n_workers=4, 
-                       threads_per_worker=1,
-                       memory_limit=0)
+client = Client(n_workers=4,
+                threads_per_worker=1,
+                memory_limit=0)
 
 
 # In[2]:
@@ -83,7 +74,7 @@ client
 filename = './nyc_taxi/*.parquet'
 df_x = dd.read_parquet(
     filename,
-    split_row_groups = 2
+    split_row_groups=2
 )
 #end::ex_load_nyc_taxi
 
@@ -119,7 +110,7 @@ df.head()
 #remember dask ddf is just pandas df
 import pandas as pd
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
-df.describe(percentiles = [.25, .5, .75]).compute()
+df.describe(percentiles=[.25, .5, .75]).compute()
 #end::ex_describe_percentiles
 
 
@@ -128,14 +119,21 @@ df.describe(percentiles = [.25, .5, .75]).compute()
 
 #tag::ex_plot_distances[]
 import matplotlib.pyplot as plt
-import seaborn as sns 
+import seaborn as sns
 import numpy as np
 
 get_ipython().run_line_magic('matplotlib', 'inline')
 sns.set(style="white", palette="muted", color_codes=True)
 f, axes = plt.subplots(1, 1, figsize=(11, 7), sharex=True)
 sns.despine(left=True)
-sns.distplot(np.log(df['trip_distance'].values+1), axlabel = 'Log(trip_distance)', label = 'log(trip_distance)', bins = 50, color="r")
+sns.distplot(
+    np.log(
+        df['trip_distance'].values +
+        1),
+    axlabel='Log(trip_distance)',
+    label='log(trip_distance)',
+    bins=50,
+    color="r")
 plt.setp(axes, yticks=[])
 plt.tight_layout()
 plt.show()
@@ -143,9 +141,6 @@ plt.show()
 
 
 # In[ ]:
-
-
-
 
 
 # In[19]:
@@ -157,9 +152,6 @@ df['trip_distance'].values.compute_chunk_sizes()
 
 
 # In[ ]:
-
-
-
 
 
 # In[20]:
@@ -175,7 +167,10 @@ print("Number of rows {} number of columns {}".format(numrows, numcols))
 # In[21]:
 
 
-df['trip_duration'] = (df['tpep_dropoff_datetime'] - df['tpep_pickup_datetime']).map(lambda x: x.total_seconds())
+df['trip_duration'] = (
+    df['tpep_dropoff_datetime'] -
+    df['tpep_pickup_datetime']).map(
+        lambda x: x.total_seconds())
 
 
 # In[22]:
@@ -208,7 +203,8 @@ df['trip_duration'].describe().compute()
 
 
 # note numpy -> ddf logic is slightly different. eg df[col].values vs df[col]
-# visualizing whole dataset is a different fish to fry, we are just showing small ones for now.
+# visualizing whole dataset is a different fish to fry, we are just
+# showing small ones for now.
 plt.hist(df['trip_duration'], bins=100)
 plt.xlabel('trip_duration')
 plt.ylabel('number of records')
@@ -216,9 +212,6 @@ plt.show()
 
 
 # In[ ]:
-
-
-
 
 
 # In[25]:
@@ -234,13 +227,10 @@ plt.hist(df['log_trip_duration'], bins=100)
 plt.xlabel('log(trip_duration)')
 plt.ylabel('number of records')
 plt.show()
-sns.distplot(df["log_trip_duration"], bins =100)
+sns.distplot(df["log_trip_duration"], bins=100)
 
 
 # In[ ]:
-
-
-
 
 
 # In[30]:
@@ -251,7 +241,7 @@ train, test, validation = df.random_split([0.8, 0.1, 0.1], random_state=123)
 #end::ex_dask_random_split
 
 
-# 
+#
 # #Start the very tedious job of enriching the dataset, pulling features and categories out
 
 # In[35]:
@@ -277,8 +267,16 @@ test = test.categorize("store_and_fwd_flag")
 # In[36]:
 
 
-vendor_train = dd.get_dummies(train, columns=["VendorID"], prefix='vi', prefix_sep='_')
-test_train = dd.get_dummies(test, columns=["VendorID"], prefix='vi', prefix_sep='_')
+vendor_train = dd.get_dummies(
+    train,
+    columns=["VendorID"],
+    prefix='vi',
+    prefix_sep='_')
+test_train = dd.get_dummies(
+    test,
+    columns=["VendorID"],
+    prefix='vi',
+    prefix_sep='_')
 
 
 # In[40]:
@@ -286,13 +284,37 @@ test_train = dd.get_dummies(test, columns=["VendorID"], prefix='vi', prefix_sep=
 
 # Full list of categorical vars
 
-vendor_train = dd.get_dummies(train, columns=["VendorID"], prefix='vi', prefix_sep='_')
-vendor_test = dd.get_dummies(test, columns=["VendorID"], prefix='vi', prefix_sep='_')
+vendor_train = dd.get_dummies(
+    train,
+    columns=["VendorID"],
+    prefix='vi',
+    prefix_sep='_')
+vendor_test = dd.get_dummies(
+    test,
+    columns=["VendorID"],
+    prefix='vi',
+    prefix_sep='_')
 
-passenger_count_train = dd.get_dummies(train, columns = ['passenger_count'], prefix='pc', prefix_sep='_')
-passenger_count_test =dd.get_dummies(test, columns= ['passenger_count'], prefix='pc', prefix_sep='_')
-store_and_fwd_flag_train = dd.get_dummies(train, columns = ['store_and_fwd_flag'], prefix='sf', prefix_sep='_')
-store_and_fwd_flag_test = dd.get_dummies(test, columns=['store_and_fwd_flag'], prefix='sf', prefix_sep='_')
+passenger_count_train = dd.get_dummies(
+    train,
+    columns=['passenger_count'],
+    prefix='pc',
+    prefix_sep='_')
+passenger_count_test = dd.get_dummies(
+    test,
+    columns=['passenger_count'],
+    prefix='pc',
+    prefix_sep='_')
+store_and_fwd_flag_train = dd.get_dummies(
+    train,
+    columns=['store_and_fwd_flag'],
+    prefix='sf',
+    prefix_sep='_')
+store_and_fwd_flag_test = dd.get_dummies(
+    test,
+    columns=['store_and_fwd_flag'],
+    prefix='sf',
+    prefix_sep='_')
 
 # enrich the datetime into month/ hour / day, and turn it into dummy
 train['Month'] = train['tpep_pickup_datetime'].dt.month
@@ -333,17 +355,49 @@ test = test.categorize("DayofMonth")
 train = train.categorize("dayofweek")
 test = test.categorize("dayofweek")
 
-month_train = dd.get_dummies(train, columns = ['dayofweek'], prefix='m', prefix_sep='_')
-month_test = dd.get_dummies(test, columns=['dayofweek'], prefix='m', prefix_sep='_')
+month_train = dd.get_dummies(
+    train,
+    columns=['dayofweek'],
+    prefix='m',
+    prefix_sep='_')
+month_test = dd.get_dummies(
+    test,
+    columns=['dayofweek'],
+    prefix='m',
+    prefix_sep='_')
 
-dom_train = dd.get_dummies(train, columns = ['dayofweek'], prefix='dom', prefix_sep='_')
-dom_test = dd.get_dummies(test, columns=['dayofweek'], prefix='dom', prefix_sep='_')
+dom_train = dd.get_dummies(
+    train,
+    columns=['dayofweek'],
+    prefix='dom',
+    prefix_sep='_')
+dom_test = dd.get_dummies(
+    test,
+    columns=['dayofweek'],
+    prefix='dom',
+    prefix_sep='_')
 
-hour_train = dd.get_dummies(train, columns = ['dayofweek'], prefix='h', prefix_sep='_')
-hour_test = dd.get_dummies(test, columns=['dayofweek'], prefix='h', prefix_sep='_')
+hour_train = dd.get_dummies(
+    train,
+    columns=['dayofweek'],
+    prefix='h',
+    prefix_sep='_')
+hour_test = dd.get_dummies(
+    test,
+    columns=['dayofweek'],
+    prefix='h',
+    prefix_sep='_')
 
-dow_train = dd.get_dummies(train, columns = ['dayofweek'], prefix='dow', prefix_sep='_')
-dow_test = dd.get_dummies(test, columns=['dayofweek'], prefix='dow', prefix_sep='_')
+dow_train = dd.get_dummies(
+    train,
+    columns=['dayofweek'],
+    prefix='dow',
+    prefix_sep='_')
+dow_test = dd.get_dummies(
+    test,
+    columns=['dayofweek'],
+    prefix='dow',
+    prefix_sep='_')
 # vendor_test = dd.get_dummies(test, columns=["VendorID"], prefix='vi', prefix_sep='_')
 
 
@@ -359,9 +413,21 @@ test['avg_speed_h'] = 1000 * test['trip_distance'] / test['trip_duration']
 
 
 fig, ax = plt.subplots(ncols=3, sharey=True)
-ax[0].plot(train.groupby('Hour').avg_speed_h.mean().compute(), 'bo-', lw=2, alpha=0.7)
-ax[1].plot(train.groupby('dayofweek').avg_speed_h.mean().compute(), 'go-', lw=2, alpha=0.7)
-ax[2].plot(train.groupby('Month').avg_speed_h.mean().compute(), 'ro-', lw=2, alpha=0.7)
+ax[0].plot(
+    train.groupby('Hour').avg_speed_h.mean().compute(),
+    'bo-',
+    lw=2,
+    alpha=0.7)
+ax[1].plot(
+    train.groupby('dayofweek').avg_speed_h.mean().compute(),
+    'go-',
+    lw=2,
+    alpha=0.7)
+ax[2].plot(
+    train.groupby('Month').avg_speed_h.mean().compute(),
+    'ro-',
+    lw=2,
+    alpha=0.7)
 ax[0].set_xlabel('Hour of Day')
 ax[1].set_xlabel('Day of Week')
 ax[2].set_xlabel('Month of Year')
@@ -373,10 +439,29 @@ plt.show()
 # In[ ]:
 
 
-train_final = train.drop(['VendorID','passenger_count','store_and_fwd_flag', 'Month','DayofMonth','Hour','dayofweek'], axis = 1)
-test_final = test.drop(['VendorID','passenger_count','store_and_fwd_flag','Month','DayofMonth','Hour','dayofweek'], axis = 1)
-train_final = train_final.drop(['tpep_dropoff_datetime', 'tpep_pickup_datetime', 'trip_duration', 'avg_speed_h'], axis = 1)
-test_final = test_final.drop(['tpep_dropoff_datetime', 'tpep_pickup_datetime', 'trip_duration', 'avg_speed_h'], axis = 1)
+train_final = train.drop(['VendorID',
+                          'passenger_count',
+                          'store_and_fwd_flag',
+                          'Month',
+                          'DayofMonth',
+                          'Hour',
+                          'dayofweek'],
+                         axis=1)
+test_final = test.drop(['VendorID',
+                        'passenger_count',
+                        'store_and_fwd_flag',
+                        'Month',
+                        'DayofMonth',
+                        'Hour',
+                        'dayofweek'],
+                       axis=1)
+train_final = train_final.drop(
+    ['tpep_dropoff_datetime', 'tpep_pickup_datetime', 'trip_duration', 'avg_speed_h'], axis=1)
+test_final = test_final.drop(['tpep_dropoff_datetime',
+                              'tpep_pickup_datetime',
+                              'trip_duration',
+                              'avg_speed_h'],
+                             axis=1)
 X_train = train_final.drop(['log_trip_duration'], axis=1)
 Y_train = train_final["log_trip_duration"]
 X_test = test_final.drop(['log_trip_duration'], axis=1)
@@ -388,13 +473,12 @@ Y_test = test_final["log_trip_duration"]
 # In[2]:
 
 
-
-
-
 # In[ ]:
 
 
-# Just like standard xgb Dmatrix, but note that we are explicitly passing in columns since we're dealing with Pandas, and that we need to give the colnames for xgb to know feature names
+# Just like standard xgb Dmatrix, but note that we are explicitly passing
+# in columns since we're dealing with Pandas, and that we need to give the
+# colnames for xgb to know feature names
 
 
 # In[60]:
@@ -404,14 +488,14 @@ Y_test = test_final["log_trip_duration"]
 
 import xgboost as xgb
 dtrain = xgb.DMatrix(X_train, label=Y_train, feature_names=X_train.columns)
-dvalid = xgb.DMatrix(X_test, label=Y_test,  feature_names=X_test.columns)
+dvalid = xgb.DMatrix(X_test, label=Y_test, feature_names=X_test.columns)
 watchlist = [(dtrain, 'train'), (dvalid, 'valid')]
-xgb_pars = {'min_child_weight': 1, 'eta': 0.5, 'colsample_bytree': 0.9, 
+xgb_pars = {'min_child_weight': 1, 'eta': 0.5, 'colsample_bytree': 0.9,
             'max_depth': 6,
-'subsample': 0.9, 'lambda': 1., 'nthread': -1, 'booster' : 'gbtree', 'silent': 1,
-'eval_metric': 'rmse', 'objective': 'reg:linear'}
+            'subsample': 0.9, 'lambda': 1., 'nthread': -1, 'booster': 'gbtree', 'silent': 1,
+            'eval_metric': 'rmse', 'objective': 'reg:linear'}
 model = xgb.train(xgb_pars, dtrain, 10, watchlist, early_stopping_rounds=2,
-      maximize=False, verbose_eval=1)
+                  maximize=False, verbose_eval=1)
 print('Modeling RMSLE %.5f' % model.best_score)
 
 xgb.plot_importance(model, max_num_features=28, height=0.7)
@@ -422,9 +506,6 @@ pred = np.exp(pred) - 1
 
 
 # In[61]:
-
-
-
 
 
 # In[62]:
@@ -442,23 +523,22 @@ def load_model(path):
 # In[63]:
 
 
-
-
-
 # In[ ]:
-
-
 #tag::Dask_DataFrame_map_partition_inference[]
 import dask.dataframe as dd
 import dask.bag as db
 
-def rowwise_operation(row, arg*):
+
+def rowwise_operation(row, arg *):
     #row-wise compute
     return result
+
+
 def partition_operation(df):
     #partition wise logic
     result = df[col1].apply(rowwise_operation)
     return result
+
 
 ddf = dd.read_csv(“metadata_of_files”)
 results = ddf.map_partitions(partition_operation)
@@ -469,9 +549,6 @@ results.compute()
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
@@ -479,6 +556,7 @@ results.compute()
 def handle_batch(batch, conn, nlp_model):
     #run_inference_here.
     conn.commit()
+
 
 def handle_partition(df):
     worker = get_worker()
@@ -501,6 +579,7 @@ def handle_partition(df):
     conn.close()
     return result
 
+
 ddf = dd.read_csv("metadata.csv”)
 results = ddf.map_partitions(handle_partition)
 results.compute()
@@ -508,7 +587,3 @@ results.compute()
 
 
 # In[ ]:
-
-
-
-

@@ -57,7 +57,3 @@ print(array.mean().compute())  # Should print 1.0|
 
 
 # In[ ]:
-
-
-
-
