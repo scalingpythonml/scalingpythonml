@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 # Dask local GPU
 import dask
 
 
-# In[ ]:
+
 
 
 #tag::dask_local_gpu[]
@@ -22,13 +22,13 @@ client = Client(cluster)
 #end::dask_local_gpu[]
 
 
-# In[ ]:
+
 
 
 cluster
 
 
-# In[ ]:
+
 
 
 def how_many_gpus(x):
@@ -36,7 +36,7 @@ def how_many_gpus(x):
     return torch.cuda.device_count()
 
 
-# In[ ]:
+
 
 
 #tag::ex_submit_gpu[]
@@ -44,13 +44,13 @@ future = client.submit(how_many_gpus, 1, resources={'GPU': 1})
 #end::ex_submit_gpu[]
 
 
-# In[ ]:
+
 
 
 client.gather(future)
 
 
-# In[ ]:
+
 
 
 #tag::ex_annotate_gpu[]
@@ -59,7 +59,7 @@ with dask.annotate(resources={'GPU': 1}):
 #end::ex_annotate_gpu[]
 
 
-# In[ ]:
+
 
 
 import numpy as np
@@ -67,7 +67,7 @@ from numba import jit, guvectorize
 import dask
 
 
-# In[ ]:
+
 
 
 #tag::ex_dask_submit_numba_incorrect[]
@@ -94,7 +94,7 @@ print(dask.compute(delayed_move_mean(arr, 3)))
 #end::ex_dask_submit_numba_incorrect[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_dask_submit_numba_correct[]
@@ -122,26 +122,26 @@ def wrapped_move_mean(*args):
     return move_mean(*args)
 
 
-# In[ ]:
+
 
 
 a = dask.delayed(wrapped_move_mean)(arr, 3)
 #end::ex_dask_submit_numba_correct[]
 
 
-# In[ ]:
+
 
 
 a
 
 
-# In[ ]:
+
 
 
 dask.compute(a)
 
 
-# In[ ]:
+
 
 
 from blazingsql import BlazingContext
@@ -150,7 +150,7 @@ import numpy as np
 bc = BlazingContext(dask_client=client)
 
 
-# In[ ]:
+
 
 
 df = cudf.DataFrame({chr(x): cudf.Series(
@@ -161,14 +161,14 @@ import dask_cudf
 ddf = dask_cudf.from_cudf(df, npartitions=2)
 
 
-# In[ ]:
+
 
 
 # Cpu fall back
 import time
 
 
-# In[ ]:
+
 
 
 from dask.distributed import Client, LocalCluster
@@ -176,13 +176,13 @@ cluster = LocalCluster(resources={})
 client = Client(cluster)
 
 
-# In[ ]:
+
 
 
 cluster.adapt(minimum=1, maximum=10)
 
 
-# In[ ]:
+
 
 
 def noop(x):
@@ -195,7 +195,7 @@ test_gpu_future = client.submit(
         'GPU': 2, 'MEMORY': 70e100})
 
 
-# In[ ]:
+
 
 
 # First make sure that the normal task has finished
@@ -205,28 +205,25 @@ time.sleep(1)
 if
 
 
-# In[ ]:
+
 
 
 client.gather(test_no_gpu_future)
 
 
-# In[ ]:
+
 
 
 test_gpu_future
 
 
-# In[ ]:
+
 
 
 test_no_gpu_future
 
 
-# In[ ]:
+
 
 
 cluster
-
-
-# In[ ]:

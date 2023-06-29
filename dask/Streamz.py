@@ -61,7 +61,7 @@ batched_kafka_stream = Stream.from_kafka_batched(
 #end::make_kafka_stream[]
 
 
-# In[ ]:
+
 
 
 #tag::wc[]
@@ -80,7 +80,7 @@ batched_kafka_stream.start()
 #end::wc[]
 
 
-# In[ ]:
+
 
 
 #tag::wc_windowed[]
@@ -100,13 +100,10 @@ windowed.sink(lambda x: print(f"WINDOWED {x}"))
 #end::wc_windowed[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 time.sleep(5)
-
-
-# In[ ]:

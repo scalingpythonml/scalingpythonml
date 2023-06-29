@@ -28,10 +28,10 @@
 # !pip install xgboost
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 # In[4]:
@@ -140,7 +140,7 @@ plt.show()
 #end::ex_plot_distances
 
 
-# In[ ]:
+
 
 
 # In[19]:
@@ -151,7 +151,7 @@ plt.show()
 df['trip_distance'].values.compute_chunk_sizes()
 
 
-# In[ ]:
+
 
 
 # In[20]:
@@ -211,7 +211,7 @@ plt.ylabel('number of records')
 plt.show()
 
 
-# In[ ]:
+
 
 
 # In[25]:
@@ -220,7 +220,7 @@ plt.show()
 df['log_trip_duration'] = np.log(df['trip_duration'])
 
 
-# In[ ]:
+
 
 
 plt.hist(df['log_trip_duration'], bins=100)
@@ -230,7 +230,7 @@ plt.show()
 sns.distplot(df["log_trip_duration"], bins=100)
 
 
-# In[ ]:
+
 
 
 # In[30]:
@@ -436,7 +436,7 @@ fig.suptitle('Average Traffic Speed by Date-part')
 plt.show()
 
 
-# In[ ]:
+
 
 
 train_final = train.drop(['VendorID',
@@ -473,7 +473,7 @@ Y_test = test_final["log_trip_duration"]
 # In[2]:
 
 
-# In[ ]:
+
 
 
 # Just like standard xgb Dmatrix, but note that we are explicitly passing
@@ -523,7 +523,7 @@ def load_model(path):
 # In[63]:
 
 
-# In[ ]:
+
 #tag::Dask_DataFrame_map_partition_inference[]
 import dask.dataframe as dd
 import dask.bag as db
@@ -546,10 +546,10 @@ results.compute()
 #end::Dask_DataFrame_map_partition_inference
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::batched_operations[]
@@ -584,6 +584,3 @@ ddf = dd.read_csv("metadata.csv”)
 results = ddf.map_partitions(handle_partition)
 results.compute()
 #end::batched_operations
-
-
-# In[ ]:

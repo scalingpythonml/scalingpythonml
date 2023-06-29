@@ -152,7 +152,7 @@ known_implementations
 #tag::known_fs_result[]
 
 
-# In[ ]:
+
 
 
 #end::known_fs_result[]
@@ -301,7 +301,7 @@ parsed_res.to_parquet(
     engine="fastparquet")
 
 
-# In[ ]:
+
 
 
 #tag::write[]
@@ -312,6 +312,3 @@ res.to_parquet("s3://dask-test/boop-test-partioned",
                compression="gzip",
                storage_options=minio_storage_options, engine="pyarrow")
 #end::write[]
-
-
-# In[ ]:

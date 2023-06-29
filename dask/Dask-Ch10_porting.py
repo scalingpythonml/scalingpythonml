@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 # !pip install dask-yarn
 
 
-# In[ ]:
+
 
 
 # !conda install -c conda-forge dask-yarn
@@ -15,7 +15,7 @@
 # sys.version
 
 
-# In[ ]:
+
 
 
 #tag::ex_yarn_deployment[]
@@ -37,10 +37,10 @@ client = Client(cluster)
 #end::ex_yarn_deployment[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::ex_slurm_deployment[]
@@ -63,10 +63,10 @@ cluster.adapt(maximum_memory="10 TB")  # or use core/memory limits
 #end::ex_slurm_deployment[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::ex_s3_minio_rw[]
@@ -98,10 +98,10 @@ df = dd.read_parquet(
 #end::ex_s3_minio_rw[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 # !pip install fugue
@@ -109,13 +109,13 @@ df = dd.read_parquet(
 # !pip install antlr4-python3-runtime==4.10.1
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
+
 
 
 # !pip install fugue
@@ -124,19 +124,19 @@ df = dd.read_parquet(
 # !conda  install aiohttp
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
+
 
 
 from fugue import transform
 
 
-# In[ ]:
+
 
 
 from fugue_notebook import setup
@@ -146,23 +146,23 @@ except:
     pass
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 import dask.dataframe as dd
 
 
-# In[ ]:
+
 
 
 url = 'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2018-01.parquet'
 df = dd.read_parquet(url)
 
 
-# In[ ]:
+
 
 
 #tag::ex_fugue_SQL[]
@@ -181,10 +181,10 @@ PRINT
 #end::ex_fugue_SQL[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 from fugue_notebook import setup
@@ -193,7 +193,7 @@ url = 'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2018-01.p
 df = dd.read_parquet(url)
 
 
-# In[ ]:
+
 
 
 get_ipython().run_cell_magic(
@@ -202,10 +202,10 @@ get_ipython().run_cell_magic(
     'tempdf = SELECT VendorID, AVG(total_amount) AS average_fare FROM df GROUP BY VendorID\n\nSELECT *\nFROM tempdf\nORDER BY average_fare DESC\nLIMIT 5\nPRINT')
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::ex_postgres_dataframe[]
@@ -214,7 +214,7 @@ df = dd.read_sql_table('accounts', 'sqlite:///path/to/your.db',
 #end::ex_postgres_dataframe[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_basic_logging[]
@@ -226,13 +226,13 @@ client.get_events("custom_events")
 #end::ex_basic_logging[]
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
+
 
 
 import numpy as np
@@ -243,7 +243,7 @@ import pandas as pd
 from dask.distributed import Client, LocalCluster
 
 
-# In[ ]:
+
 
 
 # just sanity closing older client
@@ -252,7 +252,7 @@ cluster = LocalCluster()  # Launches a scheduler and workers locally
 client = Client(cluster)  # Connect to distributed cluster and override default
 
 
-# In[ ]:
+
 
 
 #tag::ex_distributed_logging[]
@@ -291,16 +291,16 @@ client.get_events("softmax")
 #end::ex_distributed_logging[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 # client.get_worker_logs()
 
 
-# In[ ]:
+
 
 
 # plain version of the function
@@ -324,10 +324,10 @@ def compute_softmax(x, axis=0):
 scores_df.apply(compute_softmax, axis=1, meta=object).compute()
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 client.close()
