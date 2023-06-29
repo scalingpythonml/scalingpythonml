@@ -25,6 +25,3 @@ from time import sleep
 from dask.distributed import progress
 futs = client.map(sleep, range(0, 100))
 progress(futs)
-
-
-

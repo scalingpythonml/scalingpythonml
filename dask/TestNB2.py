@@ -94,6 +94,3 @@ np.take(array, indices=[0, 10]).sum().compute()
 
 
 # In[15]:
-
-
-

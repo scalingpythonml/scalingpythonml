@@ -386,6 +386,3 @@ df.persist
 from distributed.client import futures_of
 list(map(lambda x: x.release(), futures_of(df)))
 #end::manual_persist[]
-
-
-

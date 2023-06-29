@@ -107,6 +107,3 @@ windowed.sink(lambda x: print(f"WINDOWED {x}"))
 
 
 time.sleep(5)
-
-
-

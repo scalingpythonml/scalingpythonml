@@ -472,15 +472,3 @@ ddf.to_sql("transcript_analytics",
            )
 
 #end::ex_read_SQL_Dataframe[]
-
-
-
-
-
-
-
-
-
-
-
-

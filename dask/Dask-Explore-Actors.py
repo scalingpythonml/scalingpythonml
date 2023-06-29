@@ -279,6 +279,3 @@ holdens_questionable_bank.actor_for_key(
 
 holdens_questionable_bank.actor_for_key(
     "timbit").deposit("timbit", 42.0).result()
-
-
-

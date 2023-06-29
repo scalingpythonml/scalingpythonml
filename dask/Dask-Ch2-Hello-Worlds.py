@@ -230,9 +230,3 @@ with c:
 # Or global for any calls we make
 c.register()
 #end::cache[]
-
-
-
-
-
-

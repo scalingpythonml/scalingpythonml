@@ -584,6 +584,3 @@ ddf = dd.read_csv("metadata.csv”)
 results = ddf.map_partitions(handle_partition)
 results.compute()
 #end::batched_operations
-
-
-

@@ -236,9 +236,3 @@ raw_data.take(5)
 bag.from_sequence(range(0,1000))
     .map(lambda x: (x, x))
     .foldby(lambda x, y: x + y, lambda x, y: x + y)
-
-
-
-
-
-

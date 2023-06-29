@@ -312,6 +312,3 @@ res.to_parquet("s3://dask-test/boop-test-partioned",
                compression="gzip",
                storage_options=minio_storage_options, engine="pyarrow")
 #end::write[]
-
-
-

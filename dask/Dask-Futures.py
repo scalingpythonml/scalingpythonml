@@ -283,6 +283,3 @@ type(finished.done)
 
 
 # In[103]:
-
-
-

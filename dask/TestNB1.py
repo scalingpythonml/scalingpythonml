@@ -54,6 +54,3 @@ client.scheduler_comm.comm.handshake_info()
 # Create a large array and calculate the mean
 array = da.ones((1000, 1000, 1000))
 print(array.mean().compute())  # Should print 1.0|
-
-
-
