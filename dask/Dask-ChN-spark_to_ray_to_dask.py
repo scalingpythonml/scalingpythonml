@@ -104,23 +104,13 @@ import pandas as pd
 
 
 #tag::dask_on_ray[]
-
-
 import dask
 
-
 enable_dask_on_ray()
-
-
 ddf_students = ray.data.dataset.Dataset.to_dask(ray_dataset)
-
-
 ddf_students.head()
 
-
 disable_dask_on_ray()
-
-
 #end::dask_on_ray[]
 
 
