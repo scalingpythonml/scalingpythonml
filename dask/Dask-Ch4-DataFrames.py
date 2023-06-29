@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 import dask
@@ -12,7 +12,7 @@ import pandas as pd
 import dask.dataframe as dd
 
 
-# In[ ]:
+
 
 
 url = "https://gender-pay-gap.service.gov.uk/viewing/download-data/2021"
@@ -22,7 +22,7 @@ many_chunks.index
 #end::ex_load_1kb[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_load_uk_gender_pay_gap_infered[]
@@ -31,7 +31,7 @@ df = dd.read_csv(
 #end::ex_load_uk_gender_pay_gap_infered[]
 
 
-# In[ ]:
+
 
 
 # The df.compute() is not needed for the load, but because Dask is lazy we need to trigger a compute
@@ -45,7 +45,7 @@ except Exception as e:
 #end::ex_load_uk_gender_pay_gap_infered
 
 
-# In[ ]:
+
 
 
 #tag::ex_load_uk_gender_pay_gap[]
@@ -55,7 +55,7 @@ df = dd.read_csv(
 #end::ex_load_uk_gender_pay_gap[]
 
 
-# In[ ]:
+
 
 
 #tag::csv_gender_pay_gap_with_full_inference[]
@@ -67,7 +67,7 @@ df = dd.read_csv(
 #end::csv_gender_pay_gap_with_full_inference[]
 
 
-# In[ ]:
+
 
 
 #tag::fsspec[]
@@ -76,7 +76,7 @@ known_implementations
 #end::fsspec[]
 
 
-# In[ ]:
+
 
 
 #tag::filna_ex[]
@@ -91,51 +91,51 @@ new_df.clear_divisions()
 #end::filna_ex[]
 
 
-# In[ ]:
+
 
 
 new_df.compute()
 
 
-# In[ ]:
+
 
 
 narrow_df = new_df[["PostCode", "EmployerSize", "DiffMeanHourlyPercent"]]
 
 
-# In[ ]:
+
 
 
 grouped_df = narrow_df.groupby("PostCode")
 
 
-# In[ ]:
+
 
 
 alt_grouped_df = new_df.groupby(["PostCode", "SicCodes"])
 alt_grouped_df.sum().head(2)
 
 
-# In[ ]:
+
 
 
 avg_by_postalcode = grouped_df.mean()
 
 
-# In[ ]:
+
 
 
 avg_by_postalcode.compute()
 
 
-# In[ ]:
+
 
 
 ops_by_postcalcode = narrow_df.set_index("PostCode", npartitions=10)
 len(list(ops_by_postcalcode.partitions))
 
 
-# In[ ]:
+
 
 
 # Le sad, you can see this doesn't actually respect the partition size of
@@ -147,7 +147,7 @@ dask.visualize(
         partition_size=1))
 
 
-# In[ ]:
+
 
 
 indexed = narrow_df.set_index("PostCode")
@@ -159,20 +159,20 @@ dask.visualize(
         partition_size="20kb"))
 
 
-# In[ ]:
+
 
 
 dask.visualize(ops_by_postcalcode)
 
 
-# In[ ]:
+
 
 
 fast_grouped_df = ops_by_postcalcode.groupby("PostCode")
 fast_grouped_df.mean().compute()
 
 
-# In[ ]:
+
 
 
 # Kind of hacky string munging to get a median-ish to weight our values.
@@ -192,16 +192,16 @@ def update_empsize_to_median(df):
 df_with_median_emp_size = narrow_df.map_partitions(update_empsize_to_median)
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 df_with_median_emp_size.head(1)
 
 
-# In[ ]:
+
 
 
 def join_emp_with_diff(df):
@@ -217,7 +217,7 @@ df_diff_with_emp_size = df_with_median_emp_size.map_partitions(
 df_diff_with_emp_size.head(1)
 
 
-# In[ ]:
+
 
 
 #tag::custom_agg[]
@@ -250,7 +250,7 @@ j = aggregated.head(4)
 j
 
 
-# In[ ]:
+
 
 
 #tag::custom_agg_hyperloglog[]
@@ -271,14 +271,14 @@ j = aggregated.head(4)
 j
 
 
-# In[ ]:
+
 
 
 aggregated = new_df.groupby("PostCode")["EmployerId"].apply(lambda g: list(g))
 aggregated.head(4)
 
 
-# In[ ]:
+
 
 
 # For loading data example the note here is that whatever params we pass through read_x
@@ -292,19 +292,19 @@ sf_covid_df = dd.read_csv("https://data.sfgov.org/api/views/gqw3-444p/rows.csv?a
     'new_cases_7_day_avg': 'float64'}, parse_dates=['specimen_collection_date'], infer_datetime_format=True)
 
 
-# In[ ]:
+
 
 
 sf_covid_df.columns
 
 
-# In[ ]:
+
 
 
 sf_covid_df.head(10)
 
 
-# In[ ]:
+
 
 
 #tag::compute_entire_max_mean[]
@@ -315,7 +315,7 @@ dask.compute(
 #end::compute_entire_max_mean[]
 
 
-# In[ ]:
+
 
 
 #tag::agg_entire[]
@@ -329,7 +329,7 @@ dask.compute(
 #end::max_mean[]
 
 
-# In[ ]:
+
 
 
 # Drop columns & rows we don't care about before repartitioning
@@ -340,13 +340,13 @@ mini_sf_covid_df = (sf_covid_df
 #end::index_covid_data[]
 
 
-# In[ ]:
+
 
 
 mini_sf_covid_df.index
 
 
-# In[ ]:
+
 
 
 indexed_df = mini_sf_covid_df.set_index(
@@ -354,7 +354,7 @@ indexed_df = mini_sf_covid_df.set_index(
 indexed_df.head(1)
 
 
-# In[ ]:
+
 
 
 from datetime import datetime
@@ -369,38 +369,38 @@ partitioned_df_as_part_of_set_index = mini_sf_covid_df.set_index(
 #end::set_index_with_rolling_window[]
 
 
-# In[ ]:
+
 
 
 partitioned_df_as_part_of_set_index.divisions
 
 
-# In[ ]:
+
 
 
 len(list(indexed_df.partitions))
 
 
-# In[ ]:
+
 
 
 # Repartition on 14 day window
 partitioned_df = indexed_df.repartition(freq='14D', force=True)
 
 
-# In[ ]:
+
 
 
 indexed_df.divisions
 
 
-# In[ ]:
+
 
 
 partitioned_df.divisions
 
 
-# In[ ]:
+
 
 
 # Rolling average with time delta
@@ -416,7 +416,7 @@ rolling_avg = partitioned_df.map_overlap(
 #end::rolling_date_ex[]
 
 
-# In[ ]:
+
 
 
 rolling_avg.compute()
@@ -428,7 +428,7 @@ rolling_avg.compute()
 # In[5]:
 
 
-# In[ ]:
+
 
 
 #tag::ex_read_SQL_Dataframe[]
@@ -474,13 +474,13 @@ ddf.to_sql("transcript_analytics",
 #end::ex_read_SQL_Dataframe[]
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
+
+

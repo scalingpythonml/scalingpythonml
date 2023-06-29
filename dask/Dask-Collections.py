@@ -97,7 +97,7 @@ df = bag.Bag.to_dataframe(cleaned_records)
 df.head()
 
 
-# In[ ]:
+
 
 
 files = []
@@ -105,13 +105,13 @@ files = discover_files("file:///tmp/a0")
 list(files)
 
 
-# In[ ]:
+
 
 
 load_data("file:///tmp/pdfs").compute()
 
 
-# In[ ]:
+
 
 
 #tag::parallel_list[]
@@ -139,20 +139,20 @@ def parallel_recursive_list(path: str, fs=None) -> List[str]:
 #end::parallel_list[]
 
 
-# In[ ]:
+
 
 
 files = []
 files = parallel_recursive_list("file:///tmp/a0")
 
 
-# In[ ]:
+
 
 
 files
 
 
-# In[ ]:
+
 
 
 #tag::parallel_list_large[]
@@ -204,13 +204,13 @@ def parallel_list_large(path: str, npartitions=None, fs=None) -> bag:
 #end::parallel_list_large[]
 
 
-# In[ ]:
+
 
 
 parallel_list_large("/tmp/a0").compute()
 
 
-# In[ ]:
+
 
 
 #tag::custom_load_nonfs[]
@@ -224,13 +224,13 @@ raw_data = partitions.map(special_load_function).flatten()
 #end::custom_load_nonfs[]
 
 
-# In[ ]:
+
 
 
 raw_data.take(5)
 
 
-# In[ ]:
+
 
 
 bag.from_sequence(range(0,1000))
@@ -238,7 +238,7 @@ bag.from_sequence(range(0,1000))
     .foldby(lambda x, y: x + y, lambda x, y: x + y)
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+

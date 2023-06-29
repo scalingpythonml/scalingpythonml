@@ -152,7 +152,7 @@ known_implementations
 #tag::known_fs_result[]
 
 
-# In[ ]:
+
 
 
 #end::known_fs_result[]
@@ -301,7 +301,7 @@ parsed_res.to_parquet(
     engine="fastparquet")
 
 
-# In[ ]:
+
 
 
 #tag::write[]
@@ -314,4 +314,4 @@ res.to_parquet("s3://dask-test/boop-test-partioned",
 #end::write[]
 
 
-# In[ ]:
+

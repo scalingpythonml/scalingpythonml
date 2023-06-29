@@ -9,7 +9,7 @@ from dask_kubernetes import KubeCluster
 import numpy as np
 
 
-# In[ ]:
+
 
 
 #tag::remote_lb_deploy[]
@@ -32,7 +32,7 @@ cluster = KubeCluster.from_yaml(
     deploy_mode='remote')
 
 
-# In[ ]:
+
 
 
 #end::remote_lb_deploy[]
@@ -96,4 +96,4 @@ np.take(array, indices=[0, 10]).sum().compute()
 # In[15]:
 
 
-# In[ ]:
+

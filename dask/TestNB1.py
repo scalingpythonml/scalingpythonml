@@ -7,7 +7,7 @@
 from dask_kubernetes import KubeCluster
 
 
-# In[ ]:
+
 
 
 # Initial attempt at creation (also failed do to networking)
@@ -56,4 +56,4 @@ array = da.ones((1000, 1000, 1000))
 print(array.mean().compute())  # Should print 1.0|
 
 
-# In[ ]:
+

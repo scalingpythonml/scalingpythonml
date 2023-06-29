@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 import dask
@@ -18,7 +18,7 @@ dask.config.set({"multiprocessing.context": "forkserver",
 #end::dask_use_forkserver[]
 
 
-# In[ ]:
+
 
 
 import numpy as np
@@ -26,13 +26,13 @@ import numpy.typing as npt
 from typing import *
 
 
-# In[ ]:
+
 
 
 get_ipython().system('export')
 
 
-# In[ ]:
+
 
 
 #tag::make_dask_k8s_client[]
@@ -57,7 +57,7 @@ client = Client(cluster)
 #end::make_dask_k8s_client[]
 
 
-# In[ ]:
+
 
 
 #tag::dask_task_dependencies[]
@@ -78,7 +78,7 @@ compute = string_magic(f, f)
 #end::dask_task_dependencies[]
 
 
-# In[ ]:
+
 
 
 #tag::fib_task_hello_world[]
@@ -119,10 +119,10 @@ print(
 #end::fib_task_hello_world[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::fail_to_ser[]
@@ -144,7 +144,7 @@ if False:
 #end::fail_to_ser[]
 
 
-# In[ ]:
+
 
 
 # From ch2 for visualize
@@ -190,7 +190,7 @@ dask.visualize(words_bag.frequencies())
 #end::visualize[]
 
 
-# In[ ]:
+
 
 
 #tag::custom_serializer_not_own_class[]
@@ -211,7 +211,7 @@ class SerConnectionClass:
 #end::custom_serializer_not_own_class[]
 
 
-# In[ ]:
+
 
 
 # now we can sort of serialize the connection
@@ -223,7 +223,7 @@ def ok_fun(x):
 dask.compute(ok_fun(1))
 
 
-# In[ ]:
+
 
 
 # See https://github.com/dask/distributed/issues/5561
@@ -254,7 +254,7 @@ def deserialize(bad: Dict, frames: List[bytes]) -> ConnectionClass:
 # dask.compute(bad_fun(1))
 
 
-# In[ ]:
+
 
 
 #tag::serialize_class_with_numpy[]
@@ -276,25 +276,25 @@ dask.compute(ok_fun(1))
 #end::serialize_class_with_numpy[]
 
 
-# In[ ]:
+
 
 
 dask.visualize(ok_fun(1))
 
 
-# In[ ]:
+
 
 
 ok_fun(1).visualize()
 
 
-# In[ ]:
+
 
 
 ok_fun(1)
 
 
-# In[ ]:
+
 
 
 import dask.array as da
@@ -303,7 +303,7 @@ distributed_array = da.from_array(list(range(0, 10000)), chunks=10)
 #end::make_chunked_array[]
 
 
-# In[ ]:
+
 
 
 # From ch2 so we can continue the WC example
@@ -337,7 +337,7 @@ def crawl(url, depth=0, maxdepth=1, maxlinks=4):
         return [] # Skip non-web links
 
 
-# In[ ]:
+
 
 
 import dask.bag as db
@@ -350,32 +350,32 @@ some_bag.repartition(npartitions=10)
 #end::repartition_bag[]
 
 
-# In[ ]:
+
 
 
 some_bag.npartitions
 
 
-# In[ ]:
+
 
 
 distributed_array.chunks
 
 
-# In[ ]:
+
 
 
 import dask.dataframe as dd
 df = dd.from_dask_array(distributed_array)
 
 
-# In[ ]:
+
 
 
 df.index
 
 
-# In[ ]:
+
 
 
 #tag::manual_persist[]
@@ -388,4 +388,4 @@ list(map(lambda x: x.release(), futures_of(df)))
 #end::manual_persist[]
 
 
-# In[ ]:
+

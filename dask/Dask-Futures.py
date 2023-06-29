@@ -116,7 +116,7 @@ process_something(10)
 #end::fire_and_forget[]
 
 
-# In[ ]:
+
 
 
 #tag::fire_and_forget2[]
@@ -285,4 +285,4 @@ type(finished.done)
 # In[103]:
 
 
-# In[ ]:
+

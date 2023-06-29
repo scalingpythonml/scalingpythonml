@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 #tag::make_dask_client[]
@@ -11,7 +11,7 @@ client = Client() # Here we could specify a cluster, defaults to local mode
 #end::make_dask_client[]
 
 
-# In[ ]:
+
 
 
 #tag::sleepy_task_hello_world[]
@@ -39,30 +39,30 @@ print("In sequence {}, in parallel {}".format(slow_time, fast_time))
 #end::sleepy_task_hello_world[]
 
 
-# In[ ]:
+
 
 
 d = dask.delayed(slow_task)(1)
 d
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 f = client.submit(d)
 f
 
 
-# In[ ]:
+
 
 
 client.compute(dask.delayed(slow_task)(1))
 
 
-# In[ ]:
+
 
 
 # Note: if we were on a cluster we'd have to do more magic to install it
@@ -70,7 +70,7 @@ client.compute(dask.delayed(slow_task)(1))
 get_ipython().system('pip install bs4')
 
 
-# In[ ]:
+
 
 
 #tag::mini_crawl_task[]
@@ -108,7 +108,7 @@ dask.compute(crawl("http://holdenkarau.com/"))
 #end::mini_crawl_task[]
 
 
-# In[ ]:
+
 
 
 #tag::make_bag_of_crawler[]
@@ -120,7 +120,7 @@ initial_bag = db.from_delayed(map(crawl, githubs))
 #end::make_bag_of_crawler[]
 
 
-# In[ ]:
+
 
 
 #tag::make_a_bag_of_words[]
@@ -129,7 +129,7 @@ words_bag = initial_bag.map(
 #end::make_a_bag_of_words[]
 
 
-# In[ ]:
+
 
 
 #tag::wc_freq[]
@@ -137,7 +137,7 @@ dask.compute(words_bag.frequencies())
 #end::wc_freq[]
 
 
-# In[ ]:
+
 
 
 #tag::wc_func[]
@@ -157,13 +157,13 @@ word_count = words_bag.map(make_word_tuple).foldby(get_word, sum_word_counts)
 #end::wc_func[]
 
 
-# In[ ]:
+
 
 
 dask.compute(word_count)
 
 
-# In[ ]:
+
 
 
 #tag::wc_dataframe
@@ -186,7 +186,7 @@ dask.compute(wc_df)
 #end::wc_dataframe
 
 
-# In[ ]:
+
 
 
 #tag::dask_array[]
@@ -197,26 +197,26 @@ avg = dask.compute(da.average(distributed_array))
 avg
 
 
-# In[ ]:
+
 
 
 na = distributed_array.persist()
 na
 
 
-# In[ ]:
+
 
 
 dir(na)
 
 
-# In[ ]:
+
 
 
 na = None
 
 
-# In[ ]:
+
 
 
 #tag::cache[]
@@ -232,7 +232,7 @@ c.register()
 #end::cache[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+

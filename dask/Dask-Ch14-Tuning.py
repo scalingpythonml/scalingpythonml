@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+
 
 
 from dask_jobqueue import SLURMCluster
 from dask.distributed import Client
 
 
-# In[ ]:
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
+
 
 
 #tag::ex_monitor_distributed_threads[]
@@ -41,10 +41,10 @@ def print_worker_config():
 #end::ex_monitor_distributed_threads[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 from dask.distributed import Client
 from dask.distributed import LocalCluster
 cluster = LocalCluster(n_workers=10)
@@ -52,17 +52,17 @@ client = Client(cluster)
 client
 
 
-# In[ ]:
+
 
 
 import dask.array as da
 import numpy as np
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::ex_generate_performance_report[]
@@ -79,7 +79,7 @@ with performance_report(filename="computation_report.html"):
 #end::ex_generate_performance_report[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_get_task_stream[]
@@ -111,10 +111,10 @@ ts.figure
 #end::ex_get_task_stream[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 #tag::ex_memory_sampler[]
@@ -147,7 +147,7 @@ ms.plot(align=True, grid=True)
 #end::ex_memory_sampler[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_hpc_infinite_workers[]
@@ -179,7 +179,7 @@ client = Client(cluster)
 #end::ex_hpc_infinite_workers[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_yarn_deployment_tuning[]
@@ -230,7 +230,7 @@ versions = dask_client.get_versions(check=True)
 #end::ex_yarn_deployment_tuning[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_yarn_deployment_CLI_tuning[]
@@ -255,7 +255,7 @@ get_ipython().system('yarn logs -applicationId application_1516806604516_0019')
 #end::ex_yarn_deployment_tuning[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_deploy_SLURM_by_hand[]
@@ -264,7 +264,7 @@ from dask.distributed import Client
 
 
 def create_slurm_clusters(cores, processes, workers, memory="16GB",
-                          queue='regular', account="slurm_account", username="mkimmins"):
+                          queue='regular', account="account", username="user"):
     cluster = SLURMCluster(
         #ensure walltime request is reasonable within your specific cluster
         walltime="04:00:00",
@@ -295,7 +295,7 @@ client = Client(cluster)
 #end::ex_deploy_SLURM_by_hand[]
 
 
-# In[ ]:
+
 
 
 #tag::ex_slurm_deployment_tuning[]
@@ -355,16 +355,16 @@ if __name__ == "__main__":
 #end::ex_slurm_deployment_tuning[]
 
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 
 
 cluster.close()
 
 
-# In[ ]:
+
 
 
 client.close()
