@@ -2,68 +2,10 @@
 # coding: utf-8
 
 
-# !pip install scikeras>=0.1.8
-# !pip install tensorflow>=2.3.0
-# !pip install -U skorch
-# !pip install torch
-# !pip install torchvision
-# !pip install pytorch-cpu #not sure if i need to fix this
-# !pip install s3fs
-# !pip install dask_kubernetes
-# !pip install pyarrow
-# !pip install xgboost
-import seaborn as sns
-from dask_sql import Context
-import dask.datasets
-import dask.bag as db
-from dask_cuda import LocalCUDACluster
-import xgboost as xgb
-from sklearn.linear_model import SGDRegressor as ScikitSGDRegressor
-from sklearn.linear_model import LinearRegression as ScikitLinearRegression
-import dask_ml.model_selection as dcv
-from sklearn.metrics import r2_score
-from dask_ml.linear_model import LinearRegression
-from dask_ml.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from joblib import parallel_backend
-from dask_ml.preprocessing import PolynomialFeatures
-from dask_ml.preprocessing import DummyEncoder
-from pandas.api.types import CategoricalDtype
-from dask_ml.preprocessing import Categorizer
-import numpy as np
-import dask.array as da
-from dask_ml.preprocessing import StandardScaler
-import dask
-import pandas as pd
-import dask.dataframe as dd
-from dask.distributed import Client
-get_ipython().system('pip install dask_ml')
-
-
-# !pip install cloudpickle==2.1.0
-# !pip install dask==2022.05.0
-# !pip install distributed==2022.5.0
-# !pip install lz4==4.0.0
-# !pip install msgpack==1.0.3
-# !pip install toolz==0.11.2
-# !pip install xgboost
-
-
-# https://coiled.io/blog/tackling-unmanaged-memory-with-dask/
-# filename = 'https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2013-01.parquet'
-
-
-# when working with clusters, specify cluster config, n_workers and worker_size
-client = Client(n_workers=4,
-                threads_per_worker=1,
-                memory_limit=0)
-
-
-url = 'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2018-01.parquet'
-df = dd.read_parquet(url)
-
 
 #tag::ex_load_nyc_taxi[]
+import dask.dataframe as dd
+
 filename = './nyc_taxi/*.parquet'
 df_x = dd.read_parquet(
     filename,
@@ -71,17 +13,6 @@ df_x = dd.read_parquet(
 )
 #end::ex_load_nyc_taxi
 
-
-df.dtypes
-
-
-df.shape
-
-
-df
-
-
-df.head()
 
 
 #tag::ex_scaling_variables[]
@@ -122,26 +53,6 @@ dummified_df.dtypes
 dummified_df.head()
 #tag::ex_dummy_variables[]
 
-
-poly = PolynomialFeatures(2)
-
-
-categorized_df.dtypes
-
-
-categorized_df.head()
-
-
-payment_type_amt_df
-
-
-payment_type_amt_df.compute().describe()
-
-
-pickup_locations_df.dtypes
-
-
-df[["PULocationID"]].head()
 
 
 #tag::ex_joblib[]
@@ -198,57 +109,6 @@ plt.show()
 #end::ex_plot_distances
 
 
-# Show that each col is a numpy ndarray. Note how array size is NaN until we call compute.
-# chunk sizes compte also shows how this is parallelized.
-df['trip_distance'].values.compute_chunk_sizes()
-
-
-# number of rows
-numrows = df.shape[0].compute()
-# number of columns
-numcols = df.shape[1]
-print("Number of rows {} number of columns {}".format(numrows, numcols))
-
-
-df['trip_duration'] = (
-    df['tpep_dropoff_datetime'] -
-    df['tpep_pickup_datetime']).map(
-        lambda x: x.total_seconds())
-
-
-df['trip_duration'].describe().compute()
-
-
-duration_diff = np.abs(df['trip_duration'])
-
-
-# clean up data as we see some dirty inputs
-df = df[df['trip_duration'] <= 10000]
-df = df[df['trip_duration'] >= 30]
-
-
-df['trip_duration'].describe().compute()
-
-
-# note numpy -> ddf logic is slightly different. eg df[col].values vs df[col]
-# visualizing whole dataset is a different fish to fry, we are just
-# showing small ones for now.
-plt.hist(df['trip_duration'], bins=100)
-plt.xlabel('trip_duration')
-plt.ylabel('number of records')
-plt.show()
-
-
-df['log_trip_duration'] = np.log(df['trip_duration'])
-
-
-plt.hist(df['log_trip_duration'], bins=100)
-plt.xlabel('log(trip_duration)')
-plt.ylabel('number of records')
-plt.show()
-sns.distplot(df["log_trip_duration"], bins=100)
-
-
 #tag::ex_dask_random_split[]
 from dask_ml.model_selection import train_test_split
 
@@ -256,26 +116,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     df['trip_distance'], df['total_amount'])
 #end::ex_dask_random_split
 
-
-X_train, X_test, y_train, y_test = train_test_split(
-    df[['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime',
-       'passenger_count', 'trip_distance', 'RatecodeID', 'store_and_fwd_flag',
-        'PULocationID', 'DOLocationID', 'payment_type', 'fare_amount', 'extra',
-        'mta_tax', 'tip_amount', 'tolls_amount', 'improvement_surcharge', 'congestion_surcharge', 'airport_fee']],
-    df[['total_amount']])
-
-
-X_train.categorize("VendorID").dtypes
-
-
-#
-# Start the very tedious job of enriching the dataset, pulling features and categories out
-# Chain them using dask, delay materialization...
-# create dummy var out of labels.
-#
-# We could've read it at categorical when reading the parquet as specified in dtypes.
-# Or we  can do it here.
-# unlike pandas, must be categorized before calling dummy.
 
 
 #tag::ex_categorical_variables_alt[]
