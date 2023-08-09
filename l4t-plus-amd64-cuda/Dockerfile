@@ -6,12 +6,6 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu20.04 AS base-amd64
 ENV NVARCH x86_64
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN export CU_MINOR=$(nvcc --version |grep "cuda_" |cut -d "_" -f 2 |cut -d "." -f 2)
-
-ENV PIP_EXTRA "--pre --extra-index-url https://download.pytorch.org/whl/cu11${CU_MINOR}"
-RUN export PIP_EXTRA="--pre --extra-index-url https://download.pytorch.org/whl/cu11${CU_MINOR}"
-
-
 #FROM nvcr.io/nvidia/l4t-base:r32.6.1 as base-arm64
 FROM nvcr.io/nvidia/l4t-ml:r35.2.1-py3 as base-arm64
 #FROM mdegans/l4t-base:xavier as base-arm64
@@ -28,9 +22,10 @@ RUN mv /etc/apt/sources.list.d/nvidia-l4t-apt-source.list /etc/apt/ || echo "k"
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 RUN mv /etc/apt/nvidia-l4t-apt-source.list /etc/apt/sources.list.d || echo "k..."
 RUN apt-get update && apt-get upgrade -y
-ENV PIP_EXTRA "--pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51/"
 RUN export PIP_EXTRA="--pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51/"
-
+ENV PIP_EXTRA "--pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51/"
+RUN export "LD_LIBRARY_PATH=/usr/lib/llvm-8/lib:$LD_LIBRARY_PATH"
+ENV LD_LIBRARY_PATH /usr/lib/llvm-8/lib:$LD_LIBRARY_PATH
 
 FROM base-${TARGETARCH}
 ARG TARGETARCH

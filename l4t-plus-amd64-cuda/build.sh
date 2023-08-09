@@ -1,5 +1,5 @@
 set -ex
-TAG="a01082023"
+TAG="d05082023"
 CROSS_IMAGE="holdenk/cross-cuda-l4t-new:${TAG}"
 RAY_CROSS_IMAGE="holdenk/ray-x86-and-l4t:${TAG}"
 
