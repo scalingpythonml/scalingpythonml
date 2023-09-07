@@ -1,0 +1,104 @@
+ARG BASE_IMAGE="ubuntu:focal"
+FROM ${BASE_IMAGE}
+ENV TZ=America/Los_Angeles
+# TODO(ilr) $HOME seems to point to result in "" instead of "/home/ray"
+ENV PATH "/home/ray/anaconda3/bin:$PATH"
+ARG DEBIAN_FRONTEND=noninteractive
+# Required to match a cpython (cp) version in https://developer.download.nvidia.com/compute/redist/jp/v51/tensorflow/
+ARG PYTHON_VERSION=3.8
+
+ARG RAY_UID=1000
+ARG RAY_GID=100
+
+RUN apt-get update -y \
+    && apt-get install -y sudo tzdata \
+    && useradd -ms /bin/bash -d /home/ray ray --uid $RAY_UID --gid $RAY_GID \
+    && usermod -aG sudo ray \
+    && echo 'ray ALL=NOPASSWD: ALL' >> /etc/sudoers \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+RUN export HOST_TYPE=$(uname -m)
+
+USER $RAY_UID
+ENV HOME=/home/ray
+# Todo (krfricke): Move to latest miniconda version once we stop building
+# images for Python 3.7.
+# https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${HOSTTYPE}.sh
+
+SHELL ["/bin/bash", "-c"]
+RUN sudo apt-get update -y && sudo apt-get upgrade -y \
+    && sudo apt-get install -y \
+     autoconf bc build-essential g++ gcc clang lld gettext-base gfortran iputils-ping libbz2-dev libc++-dev libcgal-dev libffi-dev libfreetype6-dev libhdf5-dev libjpeg-dev liblzma-dev libncurses5-dev libncursesw5-dev libpng-dev libreadline-dev libssl-dev libsqlite3-dev libxml2-dev libxslt-dev locales moreutils openssl python-openssl rsync scons python3-pip libopenblas-dev \
+        git \
+        libjemalloc-dev \
+        wget \
+        cmake \
+        g++ \ 
+        zlib1g-dev \
+        $(if [ "$AUTOSCALER" = "autoscaler" ]; then echo \
+        tmux \
+        screen \
+        rsync \
+        netbase \
+        openssh-client \
+	kubectl \
+        gnupg; fi)  \
+    && sudo rm -rf /var/lib/apt/lists/* \
+    && sudo apt-get clean
+
+RUN if [[ "${PYTHON_VERSION}" = "3.11" || "${PYTHON_VERSION}" =~ ^3\.11\. ]]; then \
+            MINICONDA_VERSION="py310_23.3.1-0"; \
+            LIBGCC=(libgcc-ng); \
+        else \
+            MINICONDA_VERSION="py37_23.1.0-1"; \
+            # TODO (can): Remove libffi=3.3 once #33299 is resolved
+            LIBGCC=(libgcc-ng libffi=3.3); \
+        fi \
+    && wget --quiet \
+        "https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-${HOSTTYPE}.sh" \
+        -O /tmp/miniconda.sh \
+    && /bin/bash /tmp/miniconda.sh -b -u -p $HOME/anaconda3 \
+    && $HOME/anaconda3/bin/conda init \ 
+    && echo 'export PATH=$HOME/anaconda3/bin:$PATH' >> /home/ray/.bashrc \
+    && rm /tmp/miniconda.sh  \
+    && $HOME/anaconda3/bin/conda install -y "${LIBGCC[@]}" python=$PYTHON_VERSION \
+    && $HOME/anaconda3/bin/conda clean -y --all \
+    && $HOME/anaconda3/bin/pip install --no-cache-dir \
+        flatbuffers \
+        cython==0.29.32 \
+        # Necessary for Dataset to work properly.
+        numpy\>=1.20 \
+        psutil \
+	"Pydantic<2.0" $PIP_EXTRA
+
+WORKDIR $HOME
+ARG AUTOSCALER="autoscaler"
+# For Click
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+# torch is special
+# See https://developer.download.nvidia.com/compute/redist/jp/v51/tensorflow/
+RUN export CU_MINOR=$(nvcc --version |grep "cuda_" |cut -d "_" -f 2 |cut -d "." -f 2) && \
+    export TORCH_WHEEL_INDEX_URL="https://download.pytorch.org/whl/cu11${CU_MINOR}" && \
+    export PIP_EXTRA=${PIP_EXTRA:-"--pre --extra-index-url ${TORCH_WHEEL_INDEX_URL}"} && \
+    if [ "${NVARCH}" == "sbsa" ]; then \
+      $HOME/anaconda3/bin/pip --no-cache-dir install \
+          "tensorflow==2.11.0+nv23.03" \
+	  "https://developer.download.nvidia.com/compute/redist/jp/v51/pytorch/torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl" \
+	  $PIP_EXTRA; \
+    else \
+      $HOME/anaconda3/bin/pip --no-cache-dir install \
+          "tensorflow>2" $PIP_EXTRA; \
+      $HOME/anaconda3/bin/pip --no-cache-dir install \
+          torch --index-url "${TORCH_WHEEL_INDEX_URL}"; \    
+    fi
+RUN $HOME/anaconda3/bin/pip --no-cache-dir install -U \
+    ray[all] \
+    "redis>=3.5.0,<4.0.0" \
+    "six" \
+    "boto3" \
+    "pyOpenSSL" \
+    "cryptography==38.0.1" \
+    "Pydantic<2.0" $PIP_EXTRA
